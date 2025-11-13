@@ -3,8 +3,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ReviewCard from "./ReviewCard";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const FeaturedReviews = () => {
+    const { user } = useAuth(); 
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -21,7 +23,6 @@ const FeaturedReviews = () => {
     }, []);
 
     if (loading) {
-     
         return (
             <div className="flex justify-center py-10">
                 <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
@@ -35,14 +36,12 @@ const FeaturedReviews = () => {
         <section className="max-w-6xl mx-auto py-16 px-4">
             <div className="flex justify-between items-center mb-8">
                 <h2 className="text-3xl font-bold text-green-700">🌟 Featured Reviews</h2>
-                <Link to="/allreviews" className="text-green-600 underline">
-                    Show All
-                </Link>
+                <Link to="/allreviews" className="text-green-600 underline">Show All</Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {reviews.map((r) => (
-                    <ReviewCard key={r._id || r.id} review={r} />
+                    <ReviewCard key={r._id} review={r} user={user} />
                 ))}
             </div>
         </section>
