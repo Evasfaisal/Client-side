@@ -77,12 +77,12 @@ const Login = () => {
                 </p>
 
                 <div className="flex flex-col gap-4 mt-6">
-                    {/* Only Google Login */}
+                
                     <button
                         onClick={handleGoogleLogin}
                         className="flex items-center justify-center gap-2 rounded-full border-2 border-gray-400 py-2 shadow"
                     >
-                        <FcGoogle size={20} />   {/* Icon added */}
+                        <FcGoogle size={20} /> 
                         <span>Log in with Google</span>
                     </button>
                 </div>

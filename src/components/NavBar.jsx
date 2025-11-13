@@ -20,15 +20,20 @@ const NavBar = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    const handleLinkClick = () => {
+        setDropdownOpen(false); 
+        setMobileMenuOpen(false); 
+    };
+
     return (
         <nav
             className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled
-                    ? "bg-white/90 shadow-md backdrop-blur-md text-gray-800"
-                    : "bg-transparent text-white"
+                ? "bg-white/90 shadow-md backdrop-blur-md text-gray-800"
+                : "bg-transparent text-white"
                 }`}
         >
             <div className="px-4 md:px-8 py-4 flex items-center justify-between">
-               
+
                 <Link
                     to="/"
                     className={`flex items-center gap-2 text-xl md:text-2xl font-bold transition-colors duration-300 ${isScrolled ? "text-green-700" : "text-white"
@@ -48,18 +53,15 @@ const NavBar = () => {
                             to={path}
                             className={({ isActive }) =>
                                 `text-lg font-semibold transition-colors duration-300 ${isActive
-                                    ? "text-green-500" 
+                                    ? "text-green-500"
                                     : isScrolled
-                                        ? "text-gray-800 hover:text-green-600" 
-                                        : "text-white hover:text-green-500" 
+                                        ? "text-gray-800 hover:text-green-600"
+                                        : "text-white hover:text-green-500"
                                 }`
                             }
                         >
                             {label}
                         </NavLink>
-
-
-
                     ))}
 
                     {!user ? (
@@ -93,17 +95,33 @@ const NavBar = () => {
                                     <Link
                                         to="/add-review"
                                         className="block px-4 py-2 text-gray-700 hover:bg-green-50"
+                                        onClick={handleLinkClick}
                                     >
                                         Add Review
                                     </Link>
                                     <Link
                                         to="/my-reviews"
                                         className="block px-4 py-2 text-gray-700 hover:bg-green-50"
+                                        onClick={handleLinkClick}
                                     >
                                         My Reviews
                                     </Link>
+
+                                 
+                                    <Link
+                                        to="/my-favorites"
+                                        className="block px-4 py-2 text-gray-700 hover:bg-green-50 font-bold"
+                                        onClick={handleLinkClick}
+                                    >
+                                        My Favorites 
+                                    </Link>
+
+                                    <hr className="my-1" />
                                     <button
-                                        onClick={logout}
+                                        onClick={() => {
+                                            logout();
+                                            setDropdownOpen(false);
+                                        }}
                                         className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
                                     >
                                         Logout
@@ -115,6 +133,16 @@ const NavBar = () => {
                 </div>
 
                 <div className="flex md:hidden items-center gap-2">
+                  
+                    {user && (
+                        <img
+                            src={user.photoURL || "https://i.ibb.co/2yP0kzH/profile.png"}
+                            alt="User"
+                            className="w-8 h-8 rounded-full cursor-pointer border-2 border-green-500 mr-2"
+                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                        />
+                    )}
+
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className={`focus:outline-none ${isScrolled ? "text-gray-700" : "text-white"
@@ -142,7 +170,8 @@ const NavBar = () => {
                 </div>
             </div>
 
-      
+
+         
             {mobileMenuOpen && (
                 <div className="md:hidden transition bg-white/90 backdrop-blur-md shadow-lg text-gray-800">
                     {navLinks.map(({ path, label }) => (
@@ -155,6 +184,38 @@ const NavBar = () => {
                             {label}
                         </NavLink>
                     ))}
+
+                 
+                    {user && (
+                        <>
+                            <hr className="my-0" />
+                            <Link
+                                to="/add-review"
+                                className="block px-4 py-3 font-semibold text-lg hover:bg-green-50"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Add Review
+                            </Link>
+                            <Link
+                                to="/my-reviews"
+                                className="block px-4 py-3 font-semibold text-lg hover:bg-green-50"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                My Reviews
+                            </Link>
+                           
+                            <Link
+                                to="/my-favorites"
+                                className="block px-4 py-3 font-semibold text-lg hover:bg-green-50 text-green-600"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                My Favorites 
+                            </Link>
+                            <hr className="my-0" />
+                        </>
+                    )}
+
+
                     {!user ? (
                         <div className="flex flex-col gap-2 px-4 py-3">
                             <NavLink
@@ -174,7 +235,10 @@ const NavBar = () => {
                         </div>
                     ) : (
                         <button
-                            onClick={logout}
+                            onClick={() => {
+                                logout();
+                                setMobileMenuOpen(false);
+                            }}
                             className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 text-lg"
                         >
                             Logout
