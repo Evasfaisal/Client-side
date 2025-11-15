@@ -1,59 +1,100 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { Facebook, Instagram, Youtube, Linkedin, Twitter } from "lucide-react";
+import { X, Facebook, Instagram } from "lucide-react";
 
 const Footer = () => {
+    const currentYear = new Date().getFullYear();
+
     return (
-        <footer className="bg-green-700 text-white mt-10">
-            <div className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-8">
-               
-                <div>
-                    <Link to="/" className="text-2xl font-bold flex items-center gap-2">
-                        🍲 Local Food Lovers
-                    </Link>
-                    <p className="mt-3 text-sm text-gray-100 leading-relaxed">
-                        Discover the best local restaurants and share your reviews with the community.
-                        Eat local, support local!
-                    </p>
-                </div>
+        <footer className="bg-gradient-to-b from-gray-50 to-white border-t border-gray-200 py-12 mt-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
 
-              
-                <div>
-                    <h3 className="text-lg font-semibold mb-3">Quick Links</h3>
-                    <ul className="space-y-2 text-gray-100">
-                        <li><Link to="/" className="hover:underline">Home</Link></li>
-                        <li><Link to="/all-reviews" className="hover:underline">All Reviews</Link></li>
-                        <li><Link to="/login" className="hover:underline">Login</Link></li>
-                        <li><Link to="/register" className="hover:underline">Register</Link></li>
-                    </ul>
-                </div>
+                 
+                    <div className="md:col-span-1">
+                        <h3 className="text-2xl font-bold text-green-700">Local Food Lovers</h3>
+                        <p className="mt-2 text-gray-600 text-sm">
+                            Discover, share, and celebrate authentic local flavors across Bangladesh.
+                        </p>
+                        <p className="mt-3 text-xs text-gray-500">
+                            © {currentYear} Local Food Lovers. All rights reserved.
+                        </p>
+                    </div>
 
-           
-                <div>
-                    <h3 className="text-lg font-semibold mb-3">Follow Us</h3>
-                    <div className="flex items-center gap-4">
-                        <a href="#" aria-label="Facebook" className="hover:text-blue-300">
-                            <Facebook />
-                        </a>
-                        <a href="#" aria-label="Instagram" className="hover:text-pink-300">
-                            <Instagram />
-                        </a>
-                        <a href="#" aria-label="YouTube" className="hover:text-red-400">
-                            <Youtube />
-                        </a>
-                        <a href="#" aria-label="LinkedIn" className="hover:text-blue-400">
-                            <Linkedin />
-                        </a>
-                        <a href="#" aria-label="X (Twitter)" className="hover:text-gray-200">
-                            <Twitter />
-                        </a>
+                 
+                    <div>
+                        <h4 className="text-lg font-semibold text-gray-800 mb-3">Explore</h4>
+                        <ul className="space-y-2 text-sm text-gray-600">
+                            <li><a href="/" className="hover:text-green-600 transition">Home</a></li>
+                            <li><a href="/allreviews" className="hover:text-green-600 transition">All Reviews</a></li>
+                            <li><a href="/add-review" className="hover:text-green-600 transition">Add Review</a></li>
+                            <li><a href="/my-favorites" className="hover:text-green-600 transition">My Favorites</a></li>
+                        </ul>
+                    </div>
+
+                  
+                    <div>
+                        <h4 className="text-lg font-semibold text-gray-800 mb-3">For You</h4>
+                        <ul className="space-y-2 text-sm text-gray-600">
+                            <li><a href="/my-reviews" className="hover:text-green-600 transition">My Reviews</a></li>
+                            <li><a href="/login" className="hover:text-green-600 transition">Login</a></li>
+                            <li><a href="/register" className="hover:text-green-600 transition">Register</a></li>
+                        </ul>
+                    </div>
+
+                  
+                    <div>
+                        <h4 className="text-lg font-semibold text-gray-800 mb-3">Connect With Us</h4>
+                        <div className="flex justify-center md:justify-start gap-4 text-2xl mb-4">
+                            <a
+                                href="https://x.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-gray-600 hover:text-green-600 transition transform hover:scale-110"
+                                aria-label="X (Twitter)"
+                            >
+                                <X size={26} />
+                            </a>
+                            <a
+                                href="https://facebook.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-gray-600 hover:text-green-600 transition transform hover:scale-110"
+                                aria-label="Facebook"
+                            >
+                                <Facebook size={26} />
+                            </a>
+                            <a
+                                href="https://instagram.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-gray-600 hover:text-green-600 transition transform hover:scale-110"
+                                aria-label="Instagram"
+                            >
+                                <Instagram size={26} />
+                            </a>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                            Made with love in Bangladesh
+                        </p>
                     </div>
                 </div>
-            </div>
 
-           
-            <div className="border-t border-green-600 py-4 text-center text-sm text-gray-100">
-                © {new Date().getFullYear()} 🍲 Local Food Lovers — All Rights Reserved.
+               
+                <div className="mt-8 pt-6 border-t border-gray-300 text-center text-xs text-gray-500">
+                    <p>
+                        Current time: {new Date().toLocaleString("en-US", {
+                            timeZone: "Asia/Dhaka",
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            timeZoneName: "short"
+                        })}
+                    </p>
+                </div>
             </div>
         </footer>
     );

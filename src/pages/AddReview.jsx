@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -8,106 +7,158 @@ import { toast } from "react-hot-toast";
 const AddReview = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+
     const [form, setForm] = useState({
         foodName: "",
-        image: "",
+        foodImage: "",
         restaurantName: "",
         location: "",
         rating: 0,
         reviewText: "",
     });
 
+    const [loading, setLoading] = useState(false);
+
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!user) return toast.error("You must be logged in");
+
+        if (!user) {
+            toast.error("You must be logged in to add a review");
+            return;
+        }
+
+    
+        if (!form.foodName || !form.foodImage || !form.restaurantName || !form.location || !form.reviewText || form.rating < 1) {
+            toast.error("Please fill all fields and give a rating");
+            return;
+        }
 
         const payload = {
             ...form,
-            email: user.email,
-            date: new Date().toISOString(),
+            userEmail: user.email,
+            userName: user.displayName || "Anonymous",
+            userPhoto: user.photoURL || "",
+            postedDate: new Date().toISOString(),
         };
 
-        axios
-            .post("/api/reviews", payload)
-            .then(() => {
-                toast.success("Review added successfully!");
-                navigate("/my-reviews");
-            })
-            .catch((err) => {
-                console.error(err);
-                toast.error("Failed to add review");
-            });
+        try {
+            setLoading(true);
+            await axios.post("/api/reviews", payload);
+            toast.success("Review added successfully!");
+            navigate("/my-reviews");
+        } catch (err) {
+            console.error("Error adding review:", err);
+            toast.error(err.response?.data?.message || "Failed to add review");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-4">
-            <h2 className="text-2xl font-bold text-green-700 mb-6">Add Review</h2>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <input
-                    type="text"
-                    name="foodName"
-                    placeholder="Food Name"
-                    value={form.foodName}
-                    onChange={handleChange}
-                    className="border px-3 py-2 rounded"
-                    required
-                />
-                <input
-                    type="text"
-                    name="image"
-                    placeholder="Food Image URL"
-                    value={form.image}
-                    onChange={handleChange}
-                    className="border px-3 py-2 rounded"
-                    required
-                />
-                <input
-                    type="text"
-                    name="restaurantName"
-                    placeholder="Restaurant Name"
-                    value={form.restaurantName}
-                    onChange={handleChange}
-                    className="border px-3 py-2 rounded"
-                    required
-                />
-                <input
-                    type="text"
-                    name="location"
-                    placeholder="Location"
-                    value={form.location}
-                    onChange={handleChange}
-                    className="border px-3 py-2 rounded"
-                    required
-                />
-                <input
-                    type="number"
-                    name="rating"
-                    min="0"
-                    max="5"
-                    placeholder="Star Rating"
-                    value={form.rating}
-                    onChange={handleChange}
-                    className="border px-3 py-2 rounded"
-                    required
-                />
-                <textarea
-                    name="reviewText"
-                    placeholder="Review Text"
-                    value={form.reviewText}
-                    onChange={handleChange}
-                    className="border px-3 py-2 rounded"
-                    required
-                />
-                <button
-                    type="submit"
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                >
-                    Submit Review
-                </button>
+        <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-xl">
+            <h2 className="text-3xl font-bold text-green-700 mb-6 text-center">Add New Review</h2>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Food Name</label>
+                    <input
+                        name="foodName"
+                        type="text"
+                        placeholder="e.g. Biryani"
+                        value={form.foodName}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Food Image URL</label>
+                    <input
+                        name="foodImage"
+                        type="url"
+                        placeholder="https://example.com/food.jpg"
+                        value={form.foodImage}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Restaurant Name</label>
+                    <input
+                        name="restaurantName"
+                        type="text"
+                        placeholder="e.g. Star Kabab"
+                        value={form.restaurantName}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input
+                        name="location"
+                        type="text"
+                        placeholder="e.g. Dhanmondi, Dhaka"
+                        value={form.location}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Rating (1-5)</label>
+                    <input
+                        name="rating"
+                        type="number"
+                        min="1"
+                        max="5"
+                        value={form.rating}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Your Review</label>
+                    <textarea
+                        name="reviewText"
+                        rows="5"
+                        placeholder="Share your experience..."
+                        value={form.reviewText}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600"
+                        required
+                    />
+                </div>
+
+                <div className="flex gap-3">
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+                    >
+                        {loading ? "Submitting..." : "Submit Review"}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition"
+                    >
+                        Cancel
+                    </button>
+                </div>
             </form>
         </div>
     );

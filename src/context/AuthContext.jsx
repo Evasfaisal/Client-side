@@ -9,19 +9,33 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+       
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             setLoading(false);
         });
+
         return () => unsubscribe();
     }, []);
 
-    const logout = () => {
-        signOut(auth).catch((err) => console.error(err));
+  
+    const logout = async () => {
+        try {
+            await signOut(auth);
+            setUser(null);
+        } catch (error) {
+            console.error("Logout Error:", error);
+        }
+    };
+
+    const authInfo = {
+        user,
+        loading,
+        logout,
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, logout }}>
+        <AuthContext.Provider value={authInfo}>
             {children}
         </AuthContext.Provider>
     );
