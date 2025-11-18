@@ -4,11 +4,13 @@ import ReviewCard from "./ReviewCard";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-hot-toast";
+import { getFavoriteIds } from "../api/localFavorites";
 
 const RecentReviews = () => {
-    const { user } = useAuth(); 
+    const { user } = useAuth();
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [favoriteIds, setFavoriteIds] = useState([]);
 
     useEffect(() => {
         const fetchRecentReviews = async () => {
@@ -30,7 +32,11 @@ const RecentReviews = () => {
         fetchRecentReviews();
     }, []);
 
-   
+    useEffect(() => {
+        setFavoriteIds(getFavoriteIds(user?.email));
+    }, [user]);
+
+
     if (loading) {
         return (
             <section className="max-w-6xl mx-auto py-16 px-4 bg-gray-50">
@@ -44,7 +50,7 @@ const RecentReviews = () => {
         );
     }
 
-  
+
     if (!reviews.length) {
         return (
             <section className="max-w-6xl mx-auto py-16 px-4 bg-gray-50">
@@ -66,7 +72,7 @@ const RecentReviews = () => {
         );
     }
 
- 
+
     return (
         <section className="max-w-6xl mx-auto py-16 px-4 bg-gray-50">
             <div className="flex justify-between items-center mb-8">
@@ -81,7 +87,12 @@ const RecentReviews = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {reviews.map((review) => (
-                    <ReviewCard key={review._id} review={review} user={user} />
+                    <ReviewCard
+                        key={review._id}
+                        review={review}
+                        user={user}
+                        initialFavorite={favoriteIds.includes(review._id)}
+                    />
                 ))}
             </div>
         </section>

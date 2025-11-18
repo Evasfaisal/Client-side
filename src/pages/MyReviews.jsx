@@ -1,141 +1,130 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import FallbackImg from "../components/FallbackImg";
 
-const MyFavorites = () => {
+const MyReviews = () => {
     const { user } = useAuth();
-    const [favorites, setFavorites] = useState([]);
+    const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [confirmId, setConfirmId] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        if (!user) return;
+        if (!user?.email) {
+            setLoading(false);
+            return;
+        }
 
-        const fetchFavorites = async () => {
+        const fetchReviews = async () => {
             try {
-                setLoading(true);
-                const res = await axios.get(`/api/favorites?email=${user.email}`);
-                const data = Array.isArray(res.data) ? res.data : [];
-                setFavorites(data);
+                const res = await axios.get(`/api/reviews?email=${user.email}&sort=date_desc`);
+                const serverList = Array.isArray(res.data) ? res.data : [];
+                setReviews(serverList);
             } catch (err) {
-                toast.error("Failed to load favorites");
                 console.error(err);
+                toast.error("Failed to load reviews");
+                setReviews([]);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchFavorites();
-    }, [user]);
+        fetchReviews();
+    }, [user?.email]);
 
-    const toggleFavorite = async (reviewId, isCurrentlyFav) => {
-        if (!user) return toast.error("Please login!");
+    const requestDelete = (id) => setConfirmId(id);
+    const cancelDelete = () => setConfirmId(null);
 
+    const confirmDelete = async () => {
+        if (!confirmId) return;
         try {
-            if (isCurrentlyFav) {
-                await axios.delete("/api/favorites", {
-                    data: { userEmail: user.email, reviewId }
-                });
-                toast.success("Removed from favorites");
-            } else {
-                await axios.post("/api/favorites", {
-                    userEmail: user.email,
-                    reviewId
-                });
-                toast.success("Added to favorites!");
-            }
-            setFavorites(prev =>
-                prev.map(f =>
-                    f.reviewId._id === reviewId
-                        ? { ...f, isFav: !isCurrentlyFav }
-                        : f
-                )
-            );
+            await axios.delete(`/api/reviews/${confirmId}`);
+            setReviews(prev => prev.filter(r => r._id !== confirmId));
+            toast.success("Review deleted!");
         } catch (err) {
-            toast.error("Failed to update favorite");
+            toast.error(err.response?.data?.message || "Failed to delete");
+        } finally {
+            setConfirmId(null);
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600"></div>
-            </div>
-        );
-    }
+    const handleEdit = (review) => navigate(`/edit-review/${review._id}`, { state: { review } });
 
-    if (!user) {
-        return (
-            <div className="text-center py-20">
-                <p className="text-lg text-gray-600">Please login to see your favorites.</p>
-                <Link to="/login" className="mt-4 inline-block bg-green-600 text-white px-6 py-2 rounded-full">
-                    Login Now
-                </Link>
-            </div>
-        );
-    }
-
-    if (favorites.length === 0) {
-        return (
-            <div className="text-center py-20">
-                <p className="text-lg text-gray-600">You haven't added any favorites yet.</p>
-                <Link to="/allreviews" className="mt-4 inline-block bg-green-600 text-white px-6 py-2 rounded-full">
-                    Explore Reviews
-                </Link>
-            </div>
-        );
-    }
+    if (loading) return <p className="text-center py-10">Loading...</p>;
+    if (!reviews.length) return <p className="text-center py-10 text-gray-500">No reviews yet.</p>;
 
     return (
-        <div className="max-w-6xl mx-auto p-4 mt-10">
-            <h2 className="text-3xl font-bold text-green-700 mb-8 text-center">
-                My Favorite Reviews
-            </h2>
+        <div className="max-w-6xl mx-auto p-4">
+            <h2 className="text-2xl font-bold text-green-700 mb-4">My Reviews</h2>
+            <table className="min-w-full border border-gray-200 rounded-lg">
+                <thead className="bg-green-50">
+                    <tr>
+                        <th className="px-4 py-2">Image</th>
+                        <th className="px-4 py-2">Name</th>
+                        <th className="px-4 py-2">Restaurant</th>
+                        <th className="px-4 py-2">Date</th>
+                        <th className="px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {reviews.map(r => (
+                        <tr key={r._id} className="border-t">
+                            <td className="px-4 py-2">
+                                <FallbackImg
+                                    src={
+                                        r?.foodImage ||
+                                        r?.foodImageUrl ||
+                                        r?.foodImg ||
+                                        r?.food_image ||
+                                        r?.food_photo ||
+                                        r?.photo ||
+                                        r?.photoUrl ||
+                                        r?.photoURL ||
+                                        r?.image ||
+                                        r?.imageUrl ||
+                                        r?.img ||
+                                        r?.imgUrl ||
+                                        r?.url ||
+                                        r?.thumbnail ||
+                                        r?.cover ||
+                                        r?.restaurantImage ||
+                                        r?.media ||
+                                        r?.picture ||
+                                        undefined
+                                    }
+                                    alt={r.foodName}
+                                    className="w-16 h-16 object-cover rounded"
+                                />
+                            </td>
+                            <td className="px-4 py-2">{r.foodName}</td>
+                            <td className="px-4 py-2">{r.restaurantName}</td>
+                            <td className="px-4 py-2">{new Date(r.postedDate || r.createdAt || r.date).toLocaleDateString()}</td>
+                            <td className="px-4 py-2 flex gap-2">
+                                <button onClick={() => requestDelete(r._id)} className="px-3 py-1 bg-red-600 text-white rounded">Delete</button>
+                                <button onClick={() => handleEdit(r)} className="px-3 py-1 bg-blue-600 text-white rounded">Edit</button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {favorites.map((fav) => {
-                    const r = fav.reviewId;
-                    if (!r) return null;
-
-                    return (
-                        <div
-                            key={r._id}
-                            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition"
-                        >
-                            <img
-                                src={r.foodImage}
-                                alt={r.foodName}
-                                className="w-full h-48 object-cover"
-                            />
-                            <div className="p-4">
-                                <h3 className="font-bold text-lg">{r.foodName}</h3>
-                                <p className="text-gray-600 text-sm">
-                                    {r.restaurantName} • {r.location}
-                                </p>
-                                <div className="flex items-center justify-between mt-3">
-                                    <span className="text-yellow-500 font-bold">{r.rating}/5</span>
-                                    <button
-                                        onClick={() => toggleFavorite(r._id, true)}
-                                        className="text-2xl text-red-500 hover:scale-110 transition"
-                                    >
-                                        <FaHeart />
-                                    </button>
-                                </div>
-                                <Link
-                                    to={`/reviewdetails/${r._id}`}
-                                    className="mt-3 block text-center bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
-                                >
-                                    View Details
-                                </Link>
-                            </div>
+            {confirmId && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div className="bg-white w-80 p-6 rounded-xl shadow-lg space-y-4">
+                        <h3 className="text-lg font-semibold text-green-700">Confirm Deletion</h3>
+                        <p className="text-sm text-gray-600">Delete this review?</p>
+                        <div className="flex justify-end gap-3">
+                            <button onClick={cancelDelete} className="px-4 py-2 border rounded">Cancel</button>
+                            <button onClick={confirmDelete} className="px-4 py-2 bg-red-600 text-white rounded">Delete</button>
                         </div>
-                    );
-                })}
-            </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-export default MyFavorites;
+export default MyReviews;

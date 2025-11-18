@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import FallbackImg from "./FallbackImg";
 
 const TopRestaurants = () => {
     const [restaurants, setRestaurants] = useState([]);
@@ -39,8 +40,28 @@ const TopRestaurants = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {restaurants.map((r) => (
                     <div key={r._id} className="bg-white p-4 rounded-2xl shadow">
-                        <img
-                            src={r.photo}
+                        <FallbackImg
+                            src={
+                                r?.foodImage ||
+                                r?.foodImageUrl ||
+                                r?.foodImg ||
+                                r?.food_image ||
+                                r?.food_photo ||
+                                r?.photo ||
+                                r?.photoUrl ||
+                                r?.photoURL ||
+                                r?.image ||
+                                r?.imageUrl ||
+                                r?.img ||
+                                r?.imgUrl ||
+                                r?.url ||
+                                r?.thumbnail ||
+                                r?.cover ||
+                                r?.restaurantImage ||
+                                r?.media ||
+                                r?.picture ||
+                                undefined
+                            }
                             alt={r.restaurantName}
                             className="w-full h-40 object-cover rounded-lg mb-4"
                         />

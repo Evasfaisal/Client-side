@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
@@ -14,30 +14,31 @@ const EditReview = () => {
         foodImage: "",
         restaurantName: "",
         location: "",
-        rating: 0,
+        rating: 1,
         reviewText: "",
     });
 
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 
-  
     useEffect(() => {
         const fetchReview = async () => {
+            if (!id) return;
             try {
+                setLoading(true);
                 const res = await axios.get(`/api/reviews/${id}`);
                 const data = res.data;
 
-         
                 setForm({
                     foodName: data.foodName || "",
                     foodImage: data.foodImage || "",
                     restaurantName: data.restaurantName || "",
-                    location: data.location || "",
-                    rating: data.rating || 0,
+                    location: data.location || data.restaurantLocation || "",
+                    rating: data.rating || 1,
                     reviewText: data.reviewText || "",
                 });
             } catch (err) {
+                console.error("Failed to fetch review:", err);
                 toast.error("Failed to load review");
                 navigate("/my-reviews");
             } finally {
@@ -50,25 +51,32 @@ const EditReview = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm({ ...form, [name]: value });
+        if (name === "rating") {
+            const num = Math.max(1, Math.min(5, Number(value)));
+            setForm((prev) => ({ ...prev, rating: num }));
+        } else {
+            setForm((prev) => ({ ...prev, [name]: value }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!user) return toast.error("You must be logged in");
 
-        if (!user) {
-            toast.error("You must be logged in");
-            return;
-        }
-
-      
-        if (!form.foodName || !form.foodImage || !form.restaurantName || !form.location || !form.reviewText || form.rating < 1) {
-            toast.error("Please fill all fields and give a rating");
-            return;
+        if (
+            !form.foodName ||
+            !form.foodImage ||
+            !form.restaurantName ||
+            !form.location ||
+            !form.reviewText ||
+            form.rating < 1
+        ) {
+            return toast.error("Please fill all fields and give a rating");
         }
 
         const payload = {
             ...form,
+            rating: Number(form.rating),
             userEmail: user.email,
             userName: user.displayName || "Anonymous",
             userPhoto: user.photoURL || "",
@@ -196,3 +204,5 @@ const EditReview = () => {
 };
 
 export default EditReview;
+
+

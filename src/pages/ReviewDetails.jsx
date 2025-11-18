@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import FallbackImg from "../components/FallbackImg";
+import { getFavoriteReviews } from "../api/localFavorites";
 
 const ReviewDetails = () => {
-    const { id } = useParams(); 
+    const { id } = useParams();
+    const location = useLocation();
     const { user } = useAuth();
     const [review, setReview] = useState(null);
     const [loading, setLoading] = useState(true);
 
-  
+
     const bdTime = new Date().toLocaleString("en-US", {
         timeZone: "Asia/Dhaka",
         weekday: "long",
@@ -22,21 +25,34 @@ const ReviewDetails = () => {
     });
 
     useEffect(() => {
+        const fromState = location.state && location.state.review;
+        if (fromState) {
+            setReview(fromState);
+            setLoading(false);
+            return;
+        }
+
         const fetchReview = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`/api/reviews/${id}`); 
+                const res = await axios.get(`/api/reviews/${id}`);
                 setReview(res.data);
-            } catch (err) {
-                console.error("Error fetching review:", err);
-                setReview(null);
+            } catch {
+                try {
+                    const email = (typeof window !== 'undefined') ? (JSON.parse(localStorage.getItem('firebase:authUser'))?.email) : null;
+                    const list = (email && getFavoriteReviews(email)) || [];
+                    const found = list.find(r => r._id === id);
+                    setReview(found || null);
+                } catch {
+                    setReview(null);
+                }
             } finally {
                 setLoading(false);
             }
         };
 
         if (id) fetchReview();
-    }, [id]);
+    }, [id, location.state]);
 
     if (loading) {
         return (
@@ -57,10 +73,35 @@ const ReviewDetails = () => {
         );
     }
 
+    const rating = Number(review?.rating || 0);
+    const userName =
+        review?.userName ||
+        review?.user_name ||
+        review?.authorName ||
+        review?.user?.displayName ||
+        review?.user?.name ||
+        review?.name ||
+        (review?.userEmail ? String(review.userEmail).split('@')[0] : null) ||
+        "Anonymous";
+
+    const userPhoto =
+        review?.userPhoto ||
+        review?.userPhotoUrl ||
+        review?.user_photo ||
+        review?.user?.photoURL ||
+        review?.user?.photo ||
+        review?.userImage ||
+        review?.avatar ||
+        review?.profileImage ||
+        review?.user?.avatar ||
+        "https://i.ibb.co/0j3PQZb/banner1.jpg";
+
+    const postedDate = review?.postedDate || review?.createdAt || review?.date;
+
     return (
         <div className="max-w-4xl mx-auto p-6 mt-10">
 
-          
+
             <div className="bg-gradient-to-r from-green-50 to-white p-5 rounded-xl shadow-sm mb-8 border border-green-200">
                 <div className="flex flex-col sm:flex-row justify-between items-center text-gray-700">
                     <div className="flex items-center gap-2">
@@ -73,10 +114,30 @@ const ReviewDetails = () => {
                 </div>
             </div>
 
-            
+
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <img
-                    src={review.photo ||  review.foodImage}
+                <FallbackImg
+                    src={
+                        review?.foodImage ||
+                        review?.foodImageUrl ||
+                        review?.foodImg ||
+                        review?.food_image ||
+                        review?.food_photo ||
+                        review?.photo ||
+                        review?.photoUrl ||
+                        review?.photoURL ||
+                        review?.image ||
+                        review?.imageUrl ||
+                        review?.img ||
+                        review?.imgUrl ||
+                        review?.url ||
+                        review?.thumbnail ||
+                        review?.cover ||
+                        review?.restaurantImage ||
+                        review?.media ||
+                        review?.picture ||
+                        undefined
+                    }
                     alt={review.foodName}
                     className="w-full h-64 object-cover"
                 />
@@ -88,13 +149,13 @@ const ReviewDetails = () => {
 
                     <div className="flex items-center gap-2 mt-3">
                         <span className="text-yellow-500 font-bold text-xl">
-                            {review.rating}/5
+                            {rating}/5
                         </span>
                         <div className="flex">
                             {[...Array(5)].map((_, i) => (
                                 <span
                                     key={i}
-                                    className={i < review.rating ? "text-yellow-500" : "text-gray-300"}
+                                    className={i < rating ? "text-yellow-500" : "text-gray-300"}
                                 >
                                     ★
                                 </span>
@@ -106,15 +167,15 @@ const ReviewDetails = () => {
 
                     <div className="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <img
-                                src={review.userPhoto || "https://i.ibb.co/0j3PQZb/banner1.jpg"}
-                                alt={review.userName}
+                            <FallbackImg
+                                src={userPhoto}
+                                alt={userName}
                                 className="w-10 h-10 rounded-full object-cover"
                             />
                             <div>
-                                <p className="font-medium text-gray-800">{review.userName || "Anonymous"}</p>
+                                <p className="font-medium text-gray-800">{userName}</p>
                                 <p className="text-xs text-gray-500">
-                                    {new Date(review.postedDate).toLocaleDateString("en-US", {
+                                    {new Date(postedDate).toLocaleDateString("en-US", {
                                         year: "numeric",
                                         month: "long",
                                         day: "numeric"
@@ -137,7 +198,7 @@ const ReviewDetails = () => {
                                             try {
                                                 await axios.delete(`/api/reviews/${review._id}`);
                                                 window.location.href = "/my-reviews";
-                                            } catch (err) {
+                                            } catch {
                                                 alert("Delete failed");
                                             }
                                         }

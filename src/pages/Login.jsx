@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
-import { FcGoogle } from "react-icons/fc"; 
+import { FcGoogle } from "react-icons/fc";
 
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -12,22 +11,32 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-   
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            await signInWithEmailAndPassword(auth, email, password);
-            navigate("/"); 
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            const token = await user.getIdToken();
+            localStorage.setItem('token', token);
+            localStorage.setItem('userEmail', user.email || '');
+
+            toast.success("Login Successful!");
+            navigate("/");
         } catch (error) {
             toast.error(error.message);
         }
     };
 
-    
     const handleGoogleLogin = async () => {
         const provider = new GoogleAuthProvider();
         try {
-            await signInWithPopup(auth, provider);
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            const token = await user.getIdToken();
+            localStorage.setItem('token', token);
+            localStorage.setItem('userEmail', user.email || '');
+
+            toast.success("Google Login Successful!");
             navigate("/");
         } catch (error) {
             toast.error(error.message);
@@ -77,12 +86,11 @@ const Login = () => {
                 </p>
 
                 <div className="flex flex-col gap-4 mt-6">
-                
                     <button
                         onClick={handleGoogleLogin}
                         className="flex items-center justify-center gap-2 rounded-full border-2 border-gray-400 py-2 shadow"
                     >
-                        <FcGoogle size={20} /> 
+                        <FcGoogle size={20} />
                         <span>Log in with Google</span>
                     </button>
                 </div>

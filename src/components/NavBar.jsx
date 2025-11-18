@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { toast } from "react-hot-toast";
 import { FiMenu, FiX } from "react-icons/fi";
 import { FaUserCircle } from "react-icons/fa";
-import { X } from "lucide-react"; 
+
 
 const Navbar = () => {
     const { user, logout } = useAuth();

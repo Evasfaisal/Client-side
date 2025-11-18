@@ -19,30 +19,56 @@ import MyFavorites from './pages/MyFavorites.jsx';
 
 import { Toaster } from 'react-hot-toast';
 
+import axios from 'axios';
+
+axios.interceptors.request.use(
+  (config) => {
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    const userEmail = localStorage.getItem('userEmail');
+    if (userEmail && !config.headers['X-User-Email']) {
+      config.headers['X-User-Email'] = userEmail;
+    }
+
+
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 const router = createBrowserRouter([
   {
     path: '/',
     element: <MainLayout />,
     children: [
-
-  
       { path: '/', element: <Home /> },
       { path: '/home', element: <Home /> },
-
-  
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
-
-    
       { path: '/allreviews', element: <AllReviews /> },
-
-    
       {
         path: '/reviewdetails/:id',
         element: <ReviewDetails />,
       },
-
-    
       {
         path: '/add-review',
         element: (
@@ -51,18 +77,14 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-
-    
       {
-        path: '/editreview/:id',
+        path: '/edit-review/:id',
         element: (
           <PrivateRoute>
             <EditReview />
           </PrivateRoute>
         ),
       },
-
-   
       {
         path: '/my-reviews',
         element: (
@@ -71,8 +93,6 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-
-    
       {
         path: '/my-favorites',
         element: (
@@ -81,8 +101,6 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-
- 
       { path: '*', element: <NotFound /> },
     ],
   },

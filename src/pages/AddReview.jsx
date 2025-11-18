@@ -13,7 +13,7 @@ const AddReview = () => {
         foodImage: "",
         restaurantName: "",
         location: "",
-        rating: 0,
+        rating: 1,
         reviewText: "",
     });
 
@@ -32,18 +32,30 @@ const AddReview = () => {
             return;
         }
 
-    
+
         if (!form.foodName || !form.foodImage || !form.restaurantName || !form.location || !form.reviewText || form.rating < 1) {
             toast.error("Please fill all fields and give a rating");
             return;
         }
 
+        const postedDate = new Date().toISOString();
+        const rating = Number(form.rating || 0);
         const payload = {
-            ...form,
+            foodName: form.foodName,
+            restaurantName: form.restaurantName,
+            location: form.location,
+            restaurantLocation: form.location,
+            rating,
+            reviewText: form.reviewText,
+            review: form.reviewText,
+            foodImage: form.foodImage,
+            photo: form.foodImage,
+
             userEmail: user.email,
             userName: user.displayName || "Anonymous",
             userPhoto: user.photoURL || "",
-            postedDate: new Date().toISOString(),
+            postedDate,
+            date: postedDate,
         };
 
         try {

@@ -1,5 +1,6 @@
 
 import React from "react";
+import FallbackImg from "./FallbackImg";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -8,15 +9,15 @@ import "swiper/css/pagination";
 
 const HeroSlider = () => {
     const slides = [
-    
-       "https://i.ibb.co.com/JRQ25w0H/Pizza-Best-Deals-Made-with-Poster-My-Wall.jpg",
 
-        "https://i.ibb.co.com/j9SX6TDM/Burger-Discount-Voucher-Design-Template-Made-with-Poster-My-Wall-1.jpg",
-       
-        "https://i.ibb.co.com/tpLm3fvC/Restaurant-Postcard-Template-Made-with-Poster-My-Wall.jpg",
-        
-        "https://i.ibb.co.com/8LQTT5XG/Restaurant-Facebook-Shared-Post-Design-Made-with-Poster-My-Wall.jpg"
-        
+        "https://i.ibb.co/JRQ25w0H/Pizza-Best-Deals-Made-with-Poster-My-Wall.jpg",
+
+        "https://i.ibb.co/j9SX6TDM/Burger-Discount-Voucher-Design-Template-Made-with-Poster-My-Wall-1.jpg",
+
+        "https://i.ibb.co/tpLm3fvC/Restaurant-Postcard-Template-Made-with-Poster-My-Wall.jpg",
+
+        "https://i.ibb.co/8LQTT5XG/Restaurant-Facebook-Shared-Post-Design-Made-with-Poster-My-Wall.jpg"
+
     ];
 
     return (
@@ -31,7 +32,7 @@ const HeroSlider = () => {
             >
                 {slides.map((img, i) => (
                     <SwiperSlide key={i}>
-                        <img
+                        <FallbackImg
                             src={img}
                             alt={`Slide ${i + 1}`}
                             className="w-full h-auto  object-cover"

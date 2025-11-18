@@ -1,30 +1,44 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import ReviewCard from "./ReviewCard";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-hot-toast";
+import { getFavoriteIds } from "../api/localFavorites";
 
 const FeaturedReviews = () => {
-    const { user } = useAuth(); 
+    const { user } = useAuth();
     const [reviews, setReviews] = useState([]);
+    const [favoriteIds, setFavoriteIds] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const updateFavoriteOptimistically = (reviewId, isAdding) => {
+        if (isAdding) {
+            setFavoriteIds(prevIds => [...prevIds, reviewId]);
+        } else {
+            setFavoriteIds(prevIds => prevIds.filter(id => id !== reviewId));
+        }
+    };
+
     useEffect(() => {
-        const fetchTopReviews = async () => {
+        const fetchData = async () => {
+            setLoading(true);
             try {
-                setLoading(true);
-                const res = await axios.get("/api/reviews/top");
-                setReviews(Array.isArray(res.data) ? res.data : []);
-            } catch (err) {
-                toast.error("Failed to load featured reviews");
+                const reviewsRes = await api.get("/api/reviews/top");
+                setReviews(Array.isArray(reviewsRes.data) ? reviewsRes.data : []);
+                const ids = user?.email ? getFavoriteIds(user.email) : [];
+                setFavoriteIds(ids);
+            } catch (e) {
+                console.error(e);
+                toast.error("Failed to load data");
                 setReviews([]);
+                setFavoriteIds([]);
             } finally {
                 setLoading(false);
             }
         };
-        fetchTopReviews();
-    }, []);
+        fetchData();
+    }, [user]);
 
     if (loading) {
         return (
@@ -61,7 +75,12 @@ const FeaturedReviews = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {reviews.map((review) => (
-                    <ReviewCard key={review._id} review={review} user={user} />
+                    <ReviewCard
+                        key={review._id}
+                        review={review}
+                        initialFavorite={favoriteIds.includes(review._id)}
+                        updateFavoriteOptimistically={updateFavoriteOptimistically}
+                    />
                 ))}
             </div>
         </section>
