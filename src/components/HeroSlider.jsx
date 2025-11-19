@@ -1,6 +1,5 @@
 
 import React from "react";
-import FallbackImg from "./FallbackImg";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -32,10 +31,14 @@ const HeroSlider = () => {
             >
                 {slides.map((img, i) => (
                     <SwiperSlide key={i}>
-                        <FallbackImg
-                            src={img}
+                        <img
+                            src={img || "https://i.ibb.co/0j3PQZb/banner1.jpg"}
                             alt={`Slide ${i + 1}`}
                             className="w-full h-auto  object-cover"
+                            referrerPolicy="no-referrer"
+                            loading="lazy"
+                            decoding="async"
+                            onError={(e) => { e.currentTarget.src = "https://i.ibb.co/0j3PQZb/banner1.jpg"; }}
                         />
                     </SwiperSlide>
                 ))}

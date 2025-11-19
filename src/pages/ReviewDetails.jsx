@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import FallbackImg from "../components/FallbackImg";
-import { getFavoriteReviews } from "../api/localFavorites";
+
 
 const ReviewDetails = () => {
     const { id } = useParams();
@@ -38,14 +37,7 @@ const ReviewDetails = () => {
                 const res = await axios.get(`/api/reviews/${id}`);
                 setReview(res.data);
             } catch {
-                try {
-                    const email = (typeof window !== 'undefined') ? (JSON.parse(localStorage.getItem('firebase:authUser'))?.email) : null;
-                    const list = (email && getFavoriteReviews(email)) || [];
-                    const found = list.find(r => r._id === id);
-                    setReview(found || null);
-                } catch {
-                    setReview(null);
-                }
+                setReview(null);
             } finally {
                 setLoading(false);
             }
@@ -102,7 +94,7 @@ const ReviewDetails = () => {
         <div className="max-w-4xl mx-auto p-6 mt-10">
 
 
-            <div className="bg-gradient-to-r from-green-50 to-white p-5 rounded-xl shadow-sm mb-8 border border-green-200">
+            <div className="bg-linear-to-r from-green-50 to-white p-5 rounded-xl shadow-sm mb-8 border border-green-200">
                 <div className="flex flex-col sm:flex-row justify-between items-center text-gray-700">
                     <div className="flex items-center gap-2">
                         <span className="font-semibold">Current time:</span>
@@ -116,7 +108,7 @@ const ReviewDetails = () => {
 
 
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <FallbackImg
+                <img
                     src={
                         review?.foodImage ||
                         review?.foodImageUrl ||
@@ -136,10 +128,14 @@ const ReviewDetails = () => {
                         review?.restaurantImage ||
                         review?.media ||
                         review?.picture ||
-                        undefined
+                        "https://i.ibb.co/0j3PQZb/banner1.jpg"
                     }
                     alt={review.foodName}
                     className="w-full h-64 object-cover"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => { e.currentTarget.src = "https://i.ibb.co/0j3PQZb/banner1.jpg"; }}
                 />
                 <div className="p-6">
                     <h1 className="text-3xl font-bold text-green-700">{review.foodName}</h1>
@@ -167,10 +163,14 @@ const ReviewDetails = () => {
 
                     <div className="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <FallbackImg
-                                src={userPhoto}
+                            <img
+                                src={userPhoto || "https://i.ibb.co/0j3PQZb/banner1.jpg"}
                                 alt={userName}
                                 className="w-10 h-10 rounded-full object-cover"
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                decoding="async"
+                                onError={(e) => { e.currentTarget.src = "https://i.ibb.co/0j3PQZb/banner1.jpg"; }}
                             />
                             <div>
                                 <p className="font-medium text-gray-800">{userName}</p>

@@ -9,19 +9,10 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             setLoading(false);
-            try {
-                if (currentUser?.email) {
-                    localStorage.setItem('userEmail', currentUser.email);
-                } else {
-                    localStorage.removeItem('userEmail');
-                }
-            } catch {err}
         });
-
         return () => unsubscribe();
     }, []);
 
@@ -30,10 +21,6 @@ export const AuthProvider = ({ children }) => {
         try {
             await signOut(auth);
             setUser(null);
-            try {
-                localStorage.removeItem('token');
-                localStorage.removeItem('userEmail');
-            } catch {err}
         } catch (error) {
             console.error("Logout Error:", error);
         }

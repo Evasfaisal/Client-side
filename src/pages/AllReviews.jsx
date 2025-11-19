@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import api from "../api/axios";
+import axios from "axios";
 import ReviewCard from "../components/ReviewCard";
 import { useAuth } from "../context/AuthContext";
-import { getFavoriteIds } from "../api/localFavorites";
 
 const AllReviews = () => {
     const { user } = useAuth();
@@ -31,29 +30,45 @@ const AllReviews = () => {
     };
 
     useEffect(() => {
+        let cancelled = false;
         const fetchData = async () => {
             setLoading(true);
             try {
-                const reviewsRes = await api.get("/api/reviews", { params: { search } });
-                setReviews(reviewsRes.data);
+                const reviewsRes = await axios.get("/api/reviews", { params: { search } });
+                const list = Array.isArray(reviewsRes.data) ? reviewsRes.data : [];
+                list.sort((a, b) => new Date(b.postedDate || b.createdAt || b.date || 0) - new Date(a.postedDate || a.createdAt || a.date || 0));
+                if (!cancelled) setReviews(list);
 
-                const ids = user?.email ? getFavoriteIds(user.email) : [];
-                setFavoriteIds(ids);
+                const email = user?.email;
+                if (email) {
+                    try {
+                        const favRes = await axios.get('/api/favorites', { params: { email, idsOnly: true } });
+                        const ids = Array.isArray(favRes.data) ? favRes.data.map(String) : [];
+                        if (!cancelled) setFavoriteIds(ids);
+                    } catch {
+                        if (!cancelled) setFavoriteIds([]);
+                    }
+                } else {
+                    if (!cancelled) setFavoriteIds([]);
+                }
             } catch (err) {
                 console.error(err);
-                setReviews([]);
-                setFavoriteIds([]);
+                if (!cancelled) {
+                    setReviews([]);
+                    setFavoriteIds([]);
+                }
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false);
             }
         };
 
         fetchData();
-    }, [search, user]);
+        return () => { cancelled = true; };
+    }, [search, user?.email]);
 
     return (
         <div className="max-w-7xl mx-auto p-6 mt-10 min-h-screen">
-            <div className="bg-gradient-to-r from-green-50 to-white p-5 rounded-xl shadow-sm mb-8 border border-green-200">
+            <div className="bg-linear-to-r from-green-50 to-white p-5 rounded-xl shadow-sm mb-8 border border-green-200">
                 <div className="flex flex-col sm:flex-row justify-between items-center text-gray-700">
                     <div className="flex items-center gap-2">
                         <span className="font-semibold">Current time:</span>
@@ -76,7 +91,7 @@ const AllReviews = () => {
                         onChange={(e) => setSearch(e.target.value)}
                         className="flex-1 px-5 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-green-600 shadow-sm"
                     />
-                    <button className="bg-green-600 text-white px-7 py-3 rounded-xl hover:bg-green-700 transition font-medium">
+                    <button type="button" className="bg-green-600 text-white px-7 py-3 rounded-xl hover:bg-green-700 transition font-medium">
                         Search
                     </button>
                 </div>

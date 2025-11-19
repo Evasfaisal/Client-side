@@ -20,35 +20,49 @@ import MyFavorites from './pages/MyFavorites.jsx';
 import { Toaster } from 'react-hot-toast';
 
 import axios from 'axios';
+import { auth } from './firebase/firebase.config.js';
 
 axios.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+     
+      if (import.meta.env.DEV && currentUser.email && !config.headers['X-User-Email']) {
+        config.headers['X-User-Email'] = currentUser.email;
+      }
+ 
+      try {
+        const token = await currentUser.getIdToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch {
+       'error'
+      }
 
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      
+      if (import.meta.env.DEV) {
+        try {
+          const hasAuth = Boolean(config.headers.Authorization);
+          const hasEmail = Boolean(config.headers['X-User-Email']);
+          
+          console.debug('[auth headers]', {
+            url: config.url,
+            hasAuthorization: hasAuth,
+            hasXUserEmail: hasEmail,
+          });
+        } catch { }
+      }
     }
-
-    const userEmail = localStorage.getItem('userEmail');
-    if (userEmail && !config.headers['X-User-Email']) {
-      config.headers['X-User-Email'] = userEmail;
-    }
-
-
-
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-
-      localStorage.removeItem('token');
       window.location.href = '/login';
     }
     return Promise.reject(error);

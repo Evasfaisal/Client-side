@@ -3,7 +3,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import FallbackImg from "../components/FallbackImg";
+
 
 const MyReviews = () => {
     const { user } = useAuth();
@@ -73,7 +73,7 @@ const MyReviews = () => {
                     {reviews.map(r => (
                         <tr key={r._id} className="border-t">
                             <td className="px-4 py-2">
-                                <FallbackImg
+                                <img
                                     src={
                                         r?.foodImage ||
                                         r?.foodImageUrl ||
@@ -93,10 +93,14 @@ const MyReviews = () => {
                                         r?.restaurantImage ||
                                         r?.media ||
                                         r?.picture ||
-                                        undefined
+                                        "https://i.ibb.co/0j3PQZb/banner1.jpg"
                                     }
                                     alt={r.foodName}
                                     className="w-16 h-16 object-cover rounded"
+                                    referrerPolicy="no-referrer"
+                                    loading="lazy"
+                                    decoding="async"
+                                    onError={(e) => { e.currentTarget.src = "https://i.ibb.co/0j3PQZb/banner1.jpg"; }}
                                 />
                             </td>
                             <td className="px-4 py-2">{r.foodName}</td>

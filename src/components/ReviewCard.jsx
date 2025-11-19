@@ -3,15 +3,14 @@ import { useAuth } from "../context/AuthContext";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
-import { addFavorite, removeFavorite } from "../api/localFavorites";
-import FallbackImg from "./FallbackImg";
+import axios from "axios";
 
 const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistically }) => {
     const { user } = useAuth();
     const [isFavorite, setIsFavorite] = useState(initialFavorite);
     const [loading, setLoading] = useState(false);
 
-    const reviewId = review?._id?.toString();
+    const reviewId = (review?._id ?? review?.id)?.toString?.();
 
     useEffect(() => {
         setIsFavorite(initialFavorite);
@@ -34,17 +33,18 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
 
         try {
             if (previous) {
-                removeFavorite(user.email, reviewId);
+                await axios.delete(`/api/favorites/${reviewId}`);
                 toast.success("Removed from favorites");
             } else {
-                addFavorite(user.email, review);
+                await axios.post('/api/favorites', { reviewId });
                 toast.success("Added to favorites");
             }
         } catch (err) {
             console.error(err);
+            const msg = err?.response?.data?.message || err?.message || "Server sync failed";
             setIsFavorite(previous);
             updateFavoriteOptimistically?.(reviewId, previous);
-            toast.error("Something went wrong!");
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
@@ -72,10 +72,30 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
         undefined
     );
 
+    const userName = (
+        review?.userName ||
+        review?.user_name ||
+        review?.authorName ||
+        review?.user?.displayName ||
+        review?.user?.name ||
+        review?.name ||
+        (review?.userEmail ? String(review.userEmail).split('@')[0] : null) ||
+        "Anonymous"
+    );
+    const location = review?.location || review?.restaurantLocation || "";
+
     return (
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all transform hover:-translate-y-2 h-full flex flex-col">
             <div className="relative">
-                <FallbackImg src={imageUrl} alt={review?.foodName} className="w-full h-56 object-cover" />
+                <img
+                    src={imageUrl || "https://i.ibb.co/0j3PQZb/banner1.jpg"}
+                    alt={review?.foodName}
+                    className="w-full h-56 object-cover"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => { e.currentTarget.src = "https://i.ibb.co/0j3PQZb/banner1.jpg"; }}
+                />
                 <button
                     onClick={handleToggleFavorite}
                     disabled={loading}
@@ -93,8 +113,12 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
 
             <div className="p-5 flex-1 flex flex-col">
                 <h3 className="text-xl font-bold text-green-700 truncate">{review?.foodName}</h3>
-                <p className="text-gray-600 text-sm">{review?.restaurantName}</p>
-                <div className="flex justify-between items-center mt-auto">
+                <p className="text-gray-700 text-sm truncate">{review?.restaurantName}</p>
+                {location ? (
+                    <p className="text-gray-500 text-xs truncate">{location}</p>
+                ) : null}
+                <p className="text-gray-500 text-xs mt-1">By {userName}</p>
+                <div className="flex justify-between items-center mt-auto pt-3">
                     <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-bold">{Number(review?.rating || 0).toFixed(1)}/5</span>
                     <Link to={`/reviewdetails/${reviewId}`} state={{ review }} className="text-green-600 hover:underline font-medium">View Details →</Link>
                 </div>

@@ -24,6 +24,15 @@ const AddReview = () => {
         setForm({ ...form, [name]: value });
     };
 
+    const isValidUrl = (url) => {
+        try {
+            const u = new URL(url);
+            return u.protocol === 'http:' || u.protocol === 'https:';
+        } catch {
+            return false;
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -33,13 +42,25 @@ const AddReview = () => {
         }
 
 
-        if (!form.foodName || !form.foodImage || !form.restaurantName || !form.location || !form.reviewText || form.rating < 1) {
-            toast.error("Please fill all fields and give a rating");
-            return;
+        if (!form.foodName?.trim() || !form.foodImage?.trim() || !form.restaurantName?.trim() || !form.location?.trim() || !form.reviewText?.trim()) {
+            return toast.error("Please fill all fields");
+        }
+
+        if (!isValidUrl(form.foodImage)) {
+            return toast.error("Please provide a valid image URL (http/https)");
+        }
+
+        const ratingNum = Number(form.rating);
+        if (Number.isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+            return toast.error("Rating must be a number between 1 and 5");
+        }
+
+        if (form.reviewText.trim().length < 10) {
+            return toast.error("Review must be at least 10 characters");
         }
 
         const postedDate = new Date().toISOString();
-        const rating = Number(form.rating || 0);
+        const rating = ratingNum;
         const payload = {
             foodName: form.foodName,
             restaurantName: form.restaurantName,
@@ -62,7 +83,7 @@ const AddReview = () => {
             setLoading(true);
             await axios.post("/api/reviews", payload);
             toast.success("Review added successfully!");
-            navigate("/my-reviews");
+            navigate("/");
         } catch (err) {
             console.error("Error adding review:", err);
             toast.error(err.response?.data?.message || "Failed to add review");

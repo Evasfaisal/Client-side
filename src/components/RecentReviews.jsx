@@ -4,7 +4,6 @@ import ReviewCard from "./ReviewCard";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-hot-toast";
-import { getFavoriteIds } from "../api/localFavorites";
 
 const RecentReviews = () => {
     const { user } = useAuth();
@@ -16,14 +15,37 @@ const RecentReviews = () => {
         const fetchRecentReviews = async () => {
             try {
                 setLoading(true);
-                console.log("Fetching recent reviews from: /api/reviews/recent");
-                const res = await axios.get("/api/reviews/recent");
-                console.log("Recent reviews data:", res.data);
-                setReviews(Array.isArray(res.data) ? res.data : []);
-            } catch (err) {
-                console.error("Recent Reviews API Error:", err.response || err);
-                toast.error("Failed to load recent reviews");
-                setReviews([]);
+                let data = [];
+                try {
+                    const res = await axios.get("/api/reviews/recent", { params: { t: Date.now() } });
+                    data = Array.isArray(res.data) ? res.data : [];
+                    if (import.meta.env.DEV) console.debug('[RecentReviews] used /recent', { count: data.length });
+                } catch (e1) {
+                    try {
+                        const res2 = await axios.get('/api/reviews', { params: { sort: 'date_desc', limit: 6, t: Date.now() } });
+                        data = Array.isArray(res2.data) ? res2.data : (Array.isArray(res2.data?.items) ? res2.data.items : []);
+                        if (import.meta.env.DEV) console.debug('[RecentReviews] used /reviews?sort=date_desc', { count: data.length });
+                    } catch (e2) {
+                        try {
+                            const res3 = await axios.get('/api/reviews', { params: { t: Date.now() } });
+                            const raw = Array.isArray(res3.data) ? res3.data : (Array.isArray(res3.data?.items) ? res3.data.items : []);
+                            data = raw
+                                .slice()
+                                .sort((a, b) => new Date(
+                                    b.postedDate || b.createdAt || b.updatedAt || b.date || b.created_at || b.created_on || 0
+                                ) - new Date(
+                                    a.postedDate || a.createdAt || a.updatedAt || a.date || a.created_at || a.created_on || 0
+                                ))
+                                .slice(0, 6);
+                            if (import.meta.env.DEV) console.debug('[RecentReviews] used client-side sort of /reviews', { count: data.length });
+                        } catch (e3) {
+                            const msg = e3?.response?.data?.message || e3?.message || 'Network error';
+                            toast.error(`Failed to load recent reviews: ${msg}`);
+                            data = [];
+                        }
+                    }
+                }
+                setReviews(data);
             } finally {
                 setLoading(false);
             }
@@ -33,8 +55,24 @@ const RecentReviews = () => {
     }, []);
 
     useEffect(() => {
-        setFavoriteIds(getFavoriteIds(user?.email));
-    }, [user]);
+        let cancelled = false;
+        const loadFavs = async () => {
+            const email = user?.email;
+            if (!email) {
+                if (!cancelled) setFavoriteIds([]);
+                return;
+            }
+            try {
+                const res = await axios.get('/api/favorites', { params: { email, idsOnly: true } });
+                const serverIds = Array.isArray(res.data) ? res.data.map(String) : [];
+                if (!cancelled) setFavoriteIds(serverIds);
+            } catch {
+                if (!cancelled) setFavoriteIds([]);
+            }
+        };
+        loadFavs();
+        return () => { cancelled = true; };
+    }, [user?.email]);
 
 
     if (loading) {

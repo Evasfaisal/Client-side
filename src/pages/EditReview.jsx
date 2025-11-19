@@ -59,24 +59,36 @@ const EditReview = () => {
         }
     };
 
+    const isValidUrl = (url) => {
+        try {
+            const u = new URL(url);
+            return u.protocol === 'http:' || u.protocol === 'https:';
+        } catch {
+            return false;
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!user) return toast.error("You must be logged in");
 
-        if (
-            !form.foodName ||
-            !form.foodImage ||
-            !form.restaurantName ||
-            !form.location ||
-            !form.reviewText ||
-            form.rating < 1
-        ) {
-            return toast.error("Please fill all fields and give a rating");
+        if (!form.foodName?.trim() || !form.foodImage?.trim() || !form.restaurantName?.trim() || !form.location?.trim() || !form.reviewText?.trim()) {
+            return toast.error("Please fill all fields");
+        }
+        if (!isValidUrl(form.foodImage)) {
+            return toast.error("Please provide a valid image URL (http/https)");
+        }
+        const ratingNum = Number(form.rating);
+        if (Number.isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+            return toast.error("Rating must be a number between 1 and 5");
+        }
+        if (form.reviewText.trim().length < 10) {
+            return toast.error("Review must be at least 10 characters");
         }
 
         const payload = {
             ...form,
-            rating: Number(form.rating),
+            rating: ratingNum,
             userEmail: user.email,
             userName: user.displayName || "Anonymous",
             userPhoto: user.photoURL || "",

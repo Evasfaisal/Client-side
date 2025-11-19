@@ -25,10 +25,10 @@ const Navbar = () => {
 
     return (
         <nav className="bg-white shadow-md sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl lg:max-w-full">
                 <div className="flex justify-between items-center h-16">
 
-                 
+
                     <Link to="/" className="flex items-center gap-2">
                         <div className="text-2xl font-bold text-green-700">Local Food Lovers</div>
                     </Link>
@@ -51,7 +51,7 @@ const Navbar = () => {
                                     <span className="hidden lg:block">{user.displayName || "User"}</span>
                                 </button>
 
-                            
+
                                 {dropdownOpen && (
                                     <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200">
                                         <Link
@@ -103,7 +103,7 @@ const Navbar = () => {
                         )}
                     </div>
 
-               
+
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="md:hidden text-gray-700"
@@ -112,7 +112,7 @@ const Navbar = () => {
                     </button>
                 </div>
 
-              
+
                 {mobileMenuOpen && (
                     <div className="md:hidden bg-white border-t">
                         <Link to="/" className="block px-4 py-3 text-gray-700 hover:bg-green-50">Home</Link>

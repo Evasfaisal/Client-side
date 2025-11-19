@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import FallbackImg from "./FallbackImg";
 
 const TopRestaurants = () => {
     const [restaurants, setRestaurants] = useState([]);
@@ -38,42 +37,50 @@ const TopRestaurants = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {restaurants.map((r) => (
-                    <div key={r._id} className="bg-white p-4 rounded-2xl shadow">
-                        <FallbackImg
-                            src={
-                                r?.foodImage ||
-                                r?.foodImageUrl ||
-                                r?.foodImg ||
-                                r?.food_image ||
-                                r?.food_photo ||
-                                r?.photo ||
-                                r?.photoUrl ||
-                                r?.photoURL ||
-                                r?.image ||
-                                r?.imageUrl ||
-                                r?.img ||
-                                r?.imgUrl ||
-                                r?.url ||
-                                r?.thumbnail ||
-                                r?.cover ||
-                                r?.restaurantImage ||
-                                r?.media ||
-                                r?.picture ||
-                                undefined
-                            }
-                            alt={r.restaurantName}
-                            className="w-full h-40 object-cover rounded-lg mb-4"
-                        />
-                        <h3 className="text-xl font-semibold text-green-600">
-                            {r.restaurantName}
-                        </h3>
-                        <p className="text-gray-500 text-sm">{r.restaurantLocation}</p>
-                        <div className="mt-2 text-sm font-medium bg-green-100 text-green-700 px-2 py-1 rounded">
-                            ⭐ {r.rating}
+                {restaurants.map((r) => {
+                    const imgSrc = (
+                        r?.foodImage ||
+                        r?.foodImageUrl ||
+                        r?.foodImg ||
+                        r?.food_image ||
+                        r?.food_photo ||
+                        r?.photo ||
+                        r?.photoUrl ||
+                        r?.photoURL ||
+                        r?.image ||
+                        r?.imageUrl ||
+                        r?.img ||
+                        r?.imgUrl ||
+                        r?.url ||
+                        r?.thumbnail ||
+                        r?.cover ||
+                        r?.restaurantImage ||
+                        r?.media ||
+                        r?.picture ||
+                        ""
+                    );
+                    const placeholder = "https://i.ibb.co/0j3PQZb/banner1.jpg";
+                    return (
+                        <div key={r._id} className="bg-white p-4 rounded-2xl shadow">
+                            <img
+                                src={imgSrc || placeholder}
+                                alt={r.restaurantName}
+                                className="w-full h-40 object-cover rounded-lg mb-4"
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                decoding="async"
+                                onError={(e) => { e.currentTarget.src = placeholder; }}
+                            />
+                            <h3 className="text-xl font-semibold text-green-600">
+                                {r.restaurantName}
+                            </h3>
+                            <p className="text-gray-500 text-sm">{r.restaurantLocation}</p>
+                            <div className="mt-2 text-sm font-medium bg-green-100 text-green-700 px-2 py-1 rounded">
+                                ⭐ {r.rating}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </section>
     );

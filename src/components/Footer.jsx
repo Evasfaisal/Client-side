@@ -5,11 +5,11 @@ const Footer = () => {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-gradient-to-b from-gray-50 to-white border-t border-gray-200 py-12 mt-20">
+        <footer className="bg-linear-to-b from-gray-50 to-white border-t border-gray-200 py-12 mt-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
 
-                 
+
                     <div className="md:col-span-1">
                         <h3 className="text-2xl font-bold text-green-700">Local Food Lovers</h3>
                         <p className="mt-2 text-gray-600 text-sm">
@@ -20,7 +20,7 @@ const Footer = () => {
                         </p>
                     </div>
 
-                 
+
                     <div>
                         <h4 className="text-lg font-semibold text-gray-800 mb-3">Explore</h4>
                         <ul className="space-y-2 text-sm text-gray-600">
@@ -31,7 +31,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                  
+
                     <div>
                         <h4 className="text-lg font-semibold text-gray-800 mb-3">For You</h4>
                         <ul className="space-y-2 text-sm text-gray-600">
@@ -41,7 +41,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                  
+
                     <div>
                         <h4 className="text-lg font-semibold text-gray-800 mb-3">Connect With Us</h4>
                         <div className="flex justify-center md:justify-start gap-4 text-2xl mb-4">
@@ -79,7 +79,7 @@ const Footer = () => {
                     </div>
                 </div>
 
-               
+
                 <div className="mt-8 pt-6 border-t border-gray-300 text-center text-xs text-gray-500">
                     <p>
                         Current time: {new Date().toLocaleString("en-US", {

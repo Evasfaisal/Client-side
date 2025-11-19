@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import api from "../api/axios";
+import axios from "axios";
 import ReviewCard from "./ReviewCard";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-hot-toast";
-import { getFavoriteIds } from "../api/localFavorites";
 
 const FeaturedReviews = () => {
     const { user } = useAuth();
@@ -21,24 +20,54 @@ const FeaturedReviews = () => {
     };
 
     useEffect(() => {
+        let cancelled = false;
         const fetchData = async () => {
             setLoading(true);
             try {
-                const reviewsRes = await api.get("/api/reviews/top");
-                setReviews(Array.isArray(reviewsRes.data) ? reviewsRes.data : []);
-                const ids = user?.email ? getFavoriteIds(user.email) : [];
-                setFavoriteIds(ids);
-            } catch (e) {
-                console.error(e);
-                toast.error("Failed to load data");
-                setReviews([]);
-                setFavoriteIds([]);
+                let list = [];
+                try {
+                    const reviewsRes = await axios.get("/api/reviews/top");
+                    list = Array.isArray(reviewsRes.data) ? reviewsRes.data : [];
+                } catch (e) {
+                    try {
+                        const res2 = await axios.get('/api/reviews', { params: { sort: 'rating_desc', limit: 6 } });
+                        list = Array.isArray(res2.data) ? res2.data : (Array.isArray(res2.data?.items) ? res2.data.items : []);
+                    } catch (e) {
+                        try {
+                            const res3 = await axios.get('/api/reviews');
+                            const raw = Array.isArray(res3.data) ? res3.data : (Array.isArray(res3.data?.items) ? res3.data.items : []);
+                            list = raw
+                                .slice()
+                                .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0))
+                                .slice(0, 6);
+                        } catch (e) {
+                            const msg = e?.response?.data?.message || e?.message || 'Network error';
+                            toast.error(`Failed to load data: ${msg}`);
+                            list = [];
+                        }
+                    }
+                }
+                if (!cancelled) setReviews(list.slice(0, 6));
+
+                const email = user?.email;
+                if (email) {
+                    try {
+                        const favRes = await axios.get('/api/favorites', { params: { email, idsOnly: true } });
+                        const ids = Array.isArray(favRes.data) ? favRes.data.map(String) : [];
+                        if (!cancelled) setFavoriteIds(ids);
+                    } catch {
+                        if (!cancelled) setFavoriteIds([]);
+                    }
+                } else {
+                    if (!cancelled) setFavoriteIds([]);
+                }
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false);
             }
         };
         fetchData();
-    }, [user]);
+        return () => { cancelled = true; };
+    }, [user?.email]);
 
     if (loading) {
         return (
