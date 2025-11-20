@@ -1,12 +1,11 @@
 import React from "react";
 
 const images = [
-    // এখানে আপনার ইমেজ লিংকগুলো বসাবেন
-    "https://example.com/image1.jpg",
-    "https://example.com/image2.jpg",
-    "https://example.com/image3.jpg",
-    "https://example.com/image4.jpg",
-    "https://example.com/image5.jpg",
+    { src: "https://i.ibb.co.com/9HZq7wcb/dessert-creme-brulee-with-figs-currants-orange-tray-light-stone-background-autumn-composition.jpg", name: "Crème Brûlée with Figs" },
+    { src: "https://i.ibb.co.com/zhKKXNFz/shah-pilaf-with-dried-fruits-human-hand-round-plate.jpg", name: "Shah Pilaf" },
+    { src: "https://i.ibb.co.com/607yjdP5/sweet-dessert-pancake-with-banana-sweet-sauce.jpg", name: "Banana Pancake" },
+    { src: "https://i.ibb.co.com/j7j0XGG/top-view-lemon-tart-plate.jpg", name: "Lemon Tart" },
+    { src: "https://i.ibb.co.com/35JxLYkh/top-view-peach-jam-with-whipped-cream-walnut-mint-black-tea-pear-shape-glass.jpg", name: "Peach Jam & Cream" },
 ];
 
 export default function SignatureMeals() {
@@ -18,12 +17,12 @@ export default function SignatureMeals() {
                     {images.map((img, i) => (
                         <div key={i} className="bg-green-50 rounded-lg shadow p-4 flex flex-col items-center">
                             <img
-                                src={img}
-                                alt={`Signature Meal ${i + 1}`}
+                                src={img.src}
+                                alt={img.name}
                                 className="w-full h-48 object-cover rounded mb-4"
                                 loading="lazy"
                             />
-                            <p className="text-green-700 font-semibold">Signature Meal {i + 1}</p>
+                            <p className="text-green-700 font-semibold">{img.name}</p>
                         </div>
                     ))}
                 </div>
