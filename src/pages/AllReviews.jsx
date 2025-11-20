@@ -80,7 +80,7 @@ const AllReviews = () => {
                 </div>
             </div>
 
-            <h2 className="text-3xl font-bold text-green-700 mb-8 text-center">All Reviews (Public)</h2>
+            <h2 className="text-3xl font-bold text-green-700 mb-8 text-center">All Reviews</h2>
 
             <form className="mb-10 max-w-2xl mx-auto">
                 <div className="flex gap-3">
