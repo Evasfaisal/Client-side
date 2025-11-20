@@ -33,10 +33,10 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
 
         try {
             if (previous) {
-                await axios.delete(`/api/favorites/${reviewId}`);
+                await axios.delete(`https://food-lover-olive.vercel.app/api/favorites/${reviewId}`);
                 toast.success("Removed from favorites");
             } else {
-                await axios.post('/api/favorites', { reviewId });
+                await axios.post('https://food-lover-olive.vercel.app/api/favorites', { reviewId });
                 toast.success("Added to favorites");
             }
         } catch (err) {
