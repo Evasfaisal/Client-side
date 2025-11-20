@@ -90,7 +90,7 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
                 <img
                     src={imageUrl || "https://i.ibb.co/0j3PQZb/banner1.jpg"}
                     alt={review?.foodName}
-                    className="w-full h-56 object-cover"
+                    className="w-full h-[300px] object-contain"
                     referrerPolicy="no-referrer"
                     loading="lazy"
                     decoding="async"
