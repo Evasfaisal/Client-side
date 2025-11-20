@@ -113,28 +113,28 @@ const RecentReviews = () => {
 
     return (
         <section className="max-w-6xl mx-auto py-16 px-4 bg-gray-50">
-            <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl font-bold text-green-700">Recent Reviews</h2>
-                <Link
-                    to="/allreviews"
-                    className="text-green-600 hover:underline font-medium text-lg"
-                >
-                    View All →
-                </Link>
+            <div className="mb-8">
+                <h2 className="text-3xl font-bold text-green-700 text-center">Recent Reviews</h2>
+                <div className="flex justify-center mt-2">
+                    <Link
+                        to="/allreviews"
+                        className="text-green-600 hover:underline font-medium text-lg"
+                    >
+                        View All
+                    </Link>
+                </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                 {reviews.map((review) => (
                     <ReviewCard
                         key={review._id}
                         review={review}
-                        user={user}
-                        initialFavorite={favoriteIds.includes(review._id)}
+                        initialFavorite={favoriteIds.includes((review?._id ?? review?.id)?.toString?.())}
                     />
                 ))}
             </div>
         </section>
     );
-};
+}
 
 export default RecentReviews;

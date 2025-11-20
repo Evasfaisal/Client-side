@@ -95,25 +95,29 @@ const FeaturedReviews = () => {
 
     return (
         <section className="max-w-6xl mx-auto py-16 px-4">
-            <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl font-bold text-green-700">Featured Reviews</h2>
-                <Link to="/allreviews" className="text-green-600 hover:underline font-medium">
-                    Show All
-                </Link>
+            <div className="mb-8">
+                <h2 className="text-3xl font-bold text-green-700 text-center">Featured Reviews</h2>
+                <div className="flex justify-center mt-10">
+                    <Link
+                        to="/allreviews"
+                        className="text-green-600 hover:underline font-medium text-lg"
+                    >
+                        View All
+                    </Link>
+                </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                 {reviews.map((review) => (
                     <ReviewCard
                         key={review._id}
                         review={review}
-                        initialFavorite={favoriteIds.includes(review._id)}
+                        initialFavorite={favoriteIds.includes((review?._id ?? review?.id)?.toString?.())}
                         updateFavoriteOptimistically={updateFavoriteOptimistically}
                     />
                 ))}
             </div>
         </section>
     );
-};
+}
 
 export default FeaturedReviews;

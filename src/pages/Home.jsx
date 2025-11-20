@@ -3,7 +3,7 @@ import React from "react";
 import HeroSlider from "../components/HeroSlider";
 import FeaturedReviews from "../components/FeaturedReviews";
 import RecentReviews from "../components/RecentReviews";
-import TopRestaurants from "../components/TopRestaurants";
+import SignatureMeals from "../components/SignatureMeals";
 
 const Home = () => {
     return (
@@ -17,7 +17,7 @@ const Home = () => {
 
             <RecentReviews />
 
-            <TopRestaurants />
+            <SignatureMeals />
 
 
         </div>
