@@ -56,11 +56,26 @@ const ReviewDetails = () => {
 
     if (!review) {
         return (
-            <div className="max-w-4xl mx-auto p-6 mt-10 text-center">
-                <p className="text-xl text-red-600">Review not found!</p>
-                <Link to="/allreviews" className="text-green-600 hover:underline">
-                    ← Back to All Reviews
-                </Link>
+            <div className="max-w-4xl mx-auto mt-10">
+                <div className="relative w-full h-[380px] sm:h-[460px] md:h-[520px] lg:h-[560px] rounded-xl overflow-hidden shadow-lg">
+                    <img
+                        src="https://i.ibb.co/0j3PQZb/banner1.jpg"
+                        alt="Not Found"
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                    />
+                    <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-6">
+                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Review Not Found</h2>
+                        <p className="text-gray-200 mb-6 max-w-xl"></p>
+                        <Link
+                            to="/allreviews"
+                            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-medium"
+                        >
+                            ← Back to All Reviews
+                        </Link>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -188,7 +203,7 @@ const ReviewDetails = () => {
                             <div className="flex gap-2">
                                 <Link
                                     to={`/edit-review/${review._id}`}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
                                 >
                                     Edit
                                 </Link>
@@ -203,7 +218,7 @@ const ReviewDetails = () => {
                                             }
                                         }
                                     }}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium"
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
                                 >
                                     Delete
                                 </button>

@@ -78,7 +78,7 @@ const Navbar = () => {
                                         <hr className="my-1" />
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition"
+                                            className="w-full text-left px-4 py-3 text-green-600 hover:bg-green-50 transition"
                                         >
                                             Logout
                                         </button>
@@ -125,7 +125,7 @@ const Navbar = () => {
                                 <Link to="/my-favorites" className="block px-4 py-3 text-gray-700 hover:bg-green-50">My Favorites</Link>
                                 <button
                                     onClick={handleLogout}
-                                    className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50"
+                                    className="w-full text-left px-4 py-3 text-green-600 hover:bg-green-50"
                                 >
                                     Logout
                                 </button>

@@ -22,23 +22,23 @@ const MyFavorites = () => {
                 return;
             }
             try {
-                
+
                 let res;
                 try {
                     res = await axios.get('/api/favorites/reviews');
                 } catch {
-                 
+
                     res = await axios.get('/api/favorites', { params: { mode: 'reviews' } });
                 }
 
                 const raw = res?.data;
-             
+
                 const arr = Array.isArray(raw) ? raw : [];
 
-             
+
                 const normalized = arr.map(favItem => ({
                     _id: favItem._id,
-                    review: favItem.review 
+                    review: favItem.review
                 }));
 
                 if (import.meta.env.DEV) {
@@ -64,7 +64,7 @@ const MyFavorites = () => {
         return () => { cancelled = true; };
     }, [user?.email]);
 
-  
+
 
     if (!user) return <div className="text-center py-20">Please login to see your favorites.</div>;
     if (loading) return (
@@ -87,7 +87,7 @@ const MyFavorites = () => {
                 <button
                     onClick={async () => {
                         if (!user) return;
-    
+
                         const ids = favorites.map(f => f._id).filter(Boolean);
                         if (ids.length) {
                             const results = await Promise.allSettled(ids.map(id => axios.delete(`/api/favorites/${id}`)));
@@ -101,7 +101,7 @@ const MyFavorites = () => {
                         setFavorites([]);
                         toast.success("All favorites cleared");
                     }}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
                 >
                     Clear All
                 </button>
@@ -110,13 +110,13 @@ const MyFavorites = () => {
                 {favorites.map(fav => (
                     <div key={fav._id} className="relative group">
                         {fav.review ? (
-                 
+
                             <ReviewCard
                                 review={fav.review}
                                 initialFavorite={true}
                             />
                         ) : (
-                         
+
                             <div className="border rounded-lg shadow-lg p-4 h-full flex flex-col justify-between bg-gray-100">
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-500 mb-2">Review No Longer Available</h3>
@@ -129,7 +129,7 @@ const MyFavorites = () => {
                         )}
                         <button
                             onClick={async () => {
-                              
+
                                 const id = fav._id;
                                 if (!id || !user) return;
                                 try {
@@ -142,9 +142,9 @@ const MyFavorites = () => {
                                 }
                             }}
                             title="Remove from favorites"
-                            className="absolute top-3 left-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:scale-110"
+                            className="absolute bottom-3 right-3 z-20 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:scale-110"
                         >
-                            <FiTrash2 className="text-red-600 text-xl" />
+                            <FiTrash2 className="text-green-600 text-xl" />
                         </button>
                     </div>
                 ))}

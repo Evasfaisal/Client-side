@@ -118,9 +118,15 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
                     <p className="text-gray-500 text-xs truncate">{location}</p>
                 ) : null}
                 <p className="text-gray-500 text-xs mt-1">By {userName}</p>
-                <div className="flex justify-between items-center mt-auto pt-3">
-                    <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-bold">{Number(review?.rating || 0).toFixed(1)}/5</span>
-                    <Link to={`/reviewdetails/${reviewId}`} state={{ review }} className="text-green-600 hover:underline font-medium">View Details →</Link>
+                <div className="mt-auto pt-3 flex flex-col items-start">
+                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold mb-2">{Number(review?.rating || 0).toFixed(1)}/5</span>
+                    <Link
+                        to={`/reviewdetails/${reviewId}`}
+                        state={{ review }}
+                        className="text-green-600 hover:underline font-medium"
+                    >
+                        View Details →
+                    </Link>
                 </div>
             </div>
         </div>

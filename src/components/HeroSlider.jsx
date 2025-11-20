@@ -28,6 +28,10 @@ const HeroSlider = () => {
                 pagination={{ clickable: true }}
                 loop
                 className="w-full h-[250px] sm:h-[350px] md:h-[500px] lg:h-[700px]"
+                style={{
+                    '--swiper-navigation-color': '#16a34a',
+                    '--swiper-pagination-color': '#16a34a',
+                }}
             >
                 {slides.map((img, i) => (
                     <SwiperSlide key={i}>

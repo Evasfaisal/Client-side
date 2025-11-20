@@ -198,7 +198,7 @@ const EditReview = () => {
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                        className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition disabled:opacity-50"
                     >
                         {submitting ? "Updating..." : "Update Review"}
                     </button>
