@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Food Lover Network
 
 Live Site: [https://food-lover-network.web.app](https://food-lover-network.web.app)
@@ -15,3 +16,19 @@ Live Site: [https://food-lover-network.web.app](https://food-lover-network.web.a
 
 ---
 For more information, visit the live site above.
+=======
+
+# Food Lover Network
+
+Live Site: [https://food-lover-client.vercel.app/](https://food-lover-client.vercel.app/)
+
+- Full CRUD for food reviews, favorites, and ratings
+- Firebase Authentication (Email/Password & Google login)
+- Reviews and favorites stored in MongoDB database
+- Separate sections for Signature Meals, Featured, and Recent Reviews
+- Clean, foodie-style UI and fully mobile responsive
+- Search, filter, loading spinner, and custom 404 page
+
+Server: [https://food-lover-olive.vercel.app/](https://food-lover-olive.vercel.app/)
+
+>>>>>>> c05bfd13970dd0e3b7e8e6472f21cbf294be28d6

@@ -81,7 +81,7 @@ const AddReview = () => {
 
         try {
             setLoading(true);
-            await axios.post("/api/reviews", payload);
+            await axios.post("https://food-lover-olive.vercel.app/api/reviews", payload);
             toast.success("Review added successfully!");
             navigate("/");
         } catch (err) {

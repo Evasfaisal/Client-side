@@ -34,7 +34,7 @@ const AllReviews = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const reviewsRes = await axios.get("/api/reviews", { params: { search } });
+                const reviewsRes = await axios.get("https://food-lover-olive.vercel.app/api/reviews", { params: { search } });
                 const list = Array.isArray(reviewsRes.data) ? reviewsRes.data : [];
                 list.sort((a, b) => new Date(b.postedDate || b.createdAt || b.date || 0) - new Date(a.postedDate || a.createdAt || a.date || 0));
                 if (!cancelled) setReviews(list);
@@ -42,7 +42,7 @@ const AllReviews = () => {
                 const email = user?.email;
                 if (email) {
                     try {
-                        const favRes = await axios.get('/api/favorites', { params: { email, idsOnly: true } });
+                        const favRes = await axios.get('https://food-lover-olive.vercel.app/api/favorites', { params: { email, idsOnly: true } });
                         const ids = Array.isArray(favRes.data) ? favRes.data.map(String) : [];
                         if (!cancelled) setFavoriteIds(ids);
                     } catch {
