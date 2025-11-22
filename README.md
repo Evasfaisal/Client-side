@@ -1,6 +1,5 @@
 # Food Lover Network
 
-Live Site: [https://food-lover-network.web.app](https://food-lover-network.web.app)
 
 ## Key Features
 
@@ -16,8 +15,6 @@ Live Site: [https://food-lover-network.web.app](https://food-lover-network.web.a
 ---
 For more information, visit the live site above.
 
-# Food Lover Network
-Live Site: [https://food-lover-client.vercel.app/](https://food-lover-client.vercel.app/)
 
 - Full CRUD for food reviews, favorites, and ratings
 - Firebase Authentication (Email/Password & Google login)
@@ -25,6 +22,3 @@ Live Site: [https://food-lover-client.vercel.app/](https://food-lover-client.ver
 - Separate sections for Signature Meals, Featured, and Recent Reviews
 - Clean, foodie-style UI and fully mobile responsive
 - Search, filter, loading spinner, and custom 404 page
-
-Server: [https://food-lover-olive.vercel.app/](https://food-lover-olive.vercel.app/)
-

@@ -26,7 +26,7 @@ const EditReview = () => {
             if (!id) return;
             try {
                 setLoading(true);
-                const res = await axios.get(`https://food-lover-olive.vercel.app/api/reviews/${id}`);
+                const res = await axios.get(`http://localhost:5000/api/reviews/${id}`);
                 const data = res.data;
 
                 setForm({
@@ -96,7 +96,7 @@ const EditReview = () => {
 
         try {
             setSubmitting(true);
-            await axios.put(`https://food-lover-olive.vercel.app/api/reviews/${id}`, payload);
+            await axios.put(`http://localhost:5000/api/reviews/${id}`, payload);
             toast.success("Review updated successfully!");
             navigate("/my-reviews");
         } catch (err) {

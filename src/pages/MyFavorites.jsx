@@ -22,22 +22,13 @@ const MyFavorites = () => {
                 return;
             }
             try {
-<<<<<<< HEAD
-=======
-
->>>>>>> c05bfd13970dd0e3b7e8e6472f21cbf294be28d6
                 let res;
                 try {
                     res = await axios.get('/api/favorites/reviews');
                 } catch {
-<<<<<<< HEAD
-=======
-
->>>>>>> c05bfd13970dd0e3b7e8e6472f21cbf294be28d6
                     res = await axios.get('/api/favorites', { params: { mode: 'reviews' } });
                 }
                 const raw = res?.data;
-<<<<<<< HEAD
                 const arr = Array.isArray(raw) ? raw : [];
                 console.log('[MyFavorites] All favorites from API:', arr);
                 const validFavs = arr.filter(favItem => {
@@ -72,15 +63,6 @@ const MyFavorites = () => {
                             return null;
                         }
                     }
-=======
-
-                const arr = Array.isArray(raw) ? raw : [];
-
-
-                const normalized = arr.map(favItem => ({
-                    _id: favItem._id,
-                    review: favItem.review
->>>>>>> c05bfd13970dd0e3b7e8e6472f21cbf294be28d6
                 }));
                 const filtered = favsWithReview.filter(Boolean);
                 if (import.meta.env.DEV) {
@@ -149,7 +131,6 @@ const MyFavorites = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {favorites.map(fav => (
-<<<<<<< HEAD
                     fav.review ? (
                         <FavoriteCard
                             key={fav._id}
@@ -186,47 +167,6 @@ const MyFavorites = () => {
                             </div>
                         </div>
                     )
-=======
-                    <div key={fav._id} className="relative group">
-                        {fav.review ? (
-
-                            <ReviewCard
-                                review={fav.review}
-                                initialFavorite={true}
-                            />
-                        ) : (
-
-                            <div className="border rounded-lg shadow-lg p-4 h-full flex flex-col justify-between bg-gray-100">
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-500 mb-2">Review No Longer Available</h3>
-                                    <p className="text-sm text-gray-400">The original review for this item was deleted.</p>
-                                </div>
-                                <div className="mt-4 text-right">
-                                    <span className="text-xs text-gray-400">Favorite ID: {fav._id}</span>
-                                </div>
-                            </div>
-                        )}
-                        <button
-                            onClick={async () => {
-
-                                const id = fav._id;
-                                if (!id || !user) return;
-                                try {
-                                    await axios.delete(`/api/favorites/${id}`);
-                                    setFavorites(prev => prev.filter(f => f._id !== id));
-                                    toast.success("Removed");
-                                } catch (e) {
-                                    const msg = e?.response?.data?.message || e?.message || 'Server sync failed';
-                                    toast.error(msg);
-                                }
-                            }}
-                            title="Remove from favorites"
-                            className="absolute bottom-3 right-3 z-20 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:scale-110"
-                        >
-                            <FiTrash2 className="text-green-600 text-xl" />
-                        </button>
-                    </div>
->>>>>>> c05bfd13970dd0e3b7e8e6472f21cbf294be28d6
                 ))}
             </div>
         </div>

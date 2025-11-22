@@ -33,10 +33,10 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
 
         try {
             if (previous) {
-                await axios.delete(`https://food-lover-olive.vercel.app/api/favorites/${reviewId}`);
+                await axios.delete(`http://localhost:5000/api/favorites/${reviewId}`);
                 toast.success("Removed from favorites");
             } else {
-                await axios.post('https://food-lover-olive.vercel.app/api/favorites', { reviewId });
+                await axios.post('http://localhost:5000/api/favorites', { reviewId });
                 toast.success("Added to favorites");
             }
         } catch (err) {
@@ -90,11 +90,7 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
                 <img
                     src={imageUrl || "https://i.ibb.co/0j3PQZb/banner1.jpg"}
                     alt={review?.foodName}
-<<<<<<< HEAD
                     className="w-100 h-100 object-cover bg-gray-100"
-=======
-                    className="w-full h-[300px] object-contain"
->>>>>>> c05bfd13970dd0e3b7e8e6472f21cbf294be28d6
                     referrerPolicy="no-referrer"
                     loading="lazy"
                     decoding="async"

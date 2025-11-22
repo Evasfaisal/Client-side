@@ -26,15 +26,15 @@ const FeaturedReviews = () => {
             try {
                 let list = [];
                 try {
-                    const reviewsRes = await axios.get("https://food-lover-olive.vercel.app/api/reviews/top");
+                    const reviewsRes = await axios.get("http://localhost:5000/api/reviews/top");
                     list = Array.isArray(reviewsRes.data) ? reviewsRes.data : [];
                 } catch (e) {
                     try {
-                        const res2 = await axios.get('https://food-lover-olive.vercel.app/api/reviews', { params: { sort: 'rating_desc', limit: 6 } });
+                        const res2 = await axios.get('http://localhost:5000/api/reviews', { params: { sort: 'rating_desc', limit: 6 } });
                         list = Array.isArray(res2.data) ? res2.data : (Array.isArray(res2.data?.items) ? res2.data.items : []);
                     } catch (e) {
                         try {
-                            const res3 = await axios.get('https://food-lover-olive.vercel.app/api/reviews');
+                            const res3 = await axios.get('http://localhost:5000/api/reviews');
                             const raw = Array.isArray(res3.data) ? res3.data : (Array.isArray(res3.data?.items) ? res3.data.items : []);
                             list = raw
                                 .slice()
@@ -52,7 +52,7 @@ const FeaturedReviews = () => {
                 const email = user?.email;
                 if (email) {
                     try {
-                        const favRes = await axios.get('https://food-lover-olive.vercel.app/api/favorites', { params: { email, idsOnly: true } });
+                        const favRes = await axios.get('http://localhost:5000/api/favorites', { params: { email, idsOnly: true } });
                         const ids = Array.isArray(favRes.data) ? favRes.data.map(String) : [];
                         if (!cancelled) setFavoriteIds(ids);
                     } catch {
