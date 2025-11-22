@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import ReviewCard from "../components/ReviewCard";
+import FavoriteCard from "../components/FavoriteCard";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { FiTrash2 } from "react-icons/fi";
@@ -22,33 +22,56 @@ const MyFavorites = () => {
                 return;
             }
             try {
-                
                 let res;
                 try {
                     res = await axios.get('/api/favorites/reviews');
                 } catch {
-                 
                     res = await axios.get('/api/favorites', { params: { mode: 'reviews' } });
                 }
-
                 const raw = res?.data;
-             
                 const arr = Array.isArray(raw) ? raw : [];
-
-             
-                const normalized = arr.map(favItem => ({
-                    _id: favItem._id,
-                    review: favItem.review 
+                console.log('[MyFavorites] All favorites from API:', arr);
+                const validFavs = arr.filter(favItem => {
+                    const reviewField = favItem.review;
+                    const reviewId = typeof reviewField === 'string' ? reviewField : (reviewField && reviewField._id);
+                    if (!reviewField) {
+                        console.warn('[MyFavorites] Favorite missing review field:', favItem);
+                    } else if (!reviewId) {
+                        console.warn('[MyFavorites] Favorite review missing id:', reviewField);
+                    }
+                    return !!reviewId;
+                });
+                const favsWithReview = await Promise.all(validFavs.map(async favItem => {
+                    try {
+                        const reviewField = favItem.review;
+                        const reviewId = typeof reviewField === 'string' ? reviewField : (reviewField && reviewField._id);
+                        const reviewRes = await axios.get(`/api/reviews/${reviewId}`);
+                        console.log(`[MyFavorites] Review API success for id ${reviewId}:`, reviewRes.data);
+                        return {
+                            _id: favItem._id,
+                            review: reviewRes.data
+                        };
+                    } catch (err) {
+                        const reviewField = favItem.review;
+                        const reviewId = typeof reviewField === 'string' ? reviewField : (reviewField && reviewField._id);
+                        if (err?.response?.status === 404) {
+                            console.warn(`[MyFavorites] Review not found (404) for id ${reviewId}`);
+                            return null;
+                        } else {
+                            console.error(`[MyFavorites] Error loading review details for id ${reviewId}:`, err);
+                            toast.error('Error loading review details');
+                            return null;
+                        }
+                    }
                 }));
-
+                const filtered = favsWithReview.filter(Boolean);
                 if (import.meta.env.DEV) {
                     try {
                         console.log('[MyFavorites] raw favorites response:', raw);
-                        console.log('[MyFavorites] normalized favorites:', normalized);
+                        console.log('[MyFavorites] filtered valid favorites:', filtered);
                     } catch { void 0; }
                 }
-
-                if (!cancelled) setFavorites(normalized);
+                if (!cancelled) setFavorites(filtered);
             } catch (e) {
                 console.error('Failed to load favorites', e);
                 const msg = e?.response?.data?.message || e?.message || 'Failed to load favorites';
@@ -64,7 +87,7 @@ const MyFavorites = () => {
         return () => { cancelled = true; };
     }, [user?.email]);
 
-  
+
 
     if (!user) return <div className="text-center py-20">Please login to see your favorites.</div>;
     if (loading) return (
@@ -87,7 +110,7 @@ const MyFavorites = () => {
                 <button
                     onClick={async () => {
                         if (!user) return;
-    
+
                         const ids = favorites.map(f => f._id).filter(Boolean);
                         if (ids.length) {
                             const results = await Promise.allSettled(ids.map(id => axios.delete(`/api/favorites/${id}`)));
@@ -101,52 +124,49 @@ const MyFavorites = () => {
                         setFavorites([]);
                         toast.success("All favorites cleared");
                     }}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
                 >
                     Clear All
                 </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {favorites.map(fav => (
-                    <div key={fav._id} className="relative group">
-                        {fav.review ? (
-                 
-                            <ReviewCard
-                                review={fav.review}
-                                initialFavorite={true}
-                            />
-                        ) : (
-                         
-                            <div className="border rounded-lg shadow-lg p-4 h-full flex flex-col justify-between bg-gray-100">
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-500 mb-2">Review No Longer Available</h3>
-                                    <p className="text-sm text-gray-400">The original review for this item was deleted.</p>
-                                </div>
-                                <div className="mt-4 text-right">
-                                    <span className="text-xs text-gray-400">Favorite ID: {fav._id}</span>
-                                </div>
+                    fav.review ? (
+                        <FavoriteCard
+                            key={fav._id}
+                            review={fav.review}
+                            favoriteId={fav._id}
+                            onDelete={(id) => setFavorites(prev => prev.filter(f => f._id !== id))}
+                        />
+                    ) : (
+                        <div key={fav._id} className="border rounded-lg shadow-lg p-4 h-full flex flex-col justify-between bg-gray-100 relative">
+                            <button
+                                onClick={async () => {
+                                    const id = fav._id;
+                                    if (!id || !user) return;
+                                    try {
+                                        await axios.delete(`/api/favorites/${id}`);
+                                        setFavorites(prev => prev.filter(f => f._id !== id));
+                                        toast.success("Removed");
+                                    } catch (e) {
+                                        const msg = e?.response?.data?.message || e?.message || 'Server sync failed';
+                                        toast.error(msg);
+                                    }
+                                }}
+                                title="Remove from favorites"
+                                className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg z-10 hover:scale-110 transition-all"
+                            >
+                                <FiTrash2 className="text-red-600 text-2xl drop-shadow" />
+                            </button>
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-500 mb-2">Review No Longer Available</h3>
+                                <p className="text-sm text-gray-400">The original review for this item was deleted.</p>
                             </div>
-                        )}
-                        <button
-                            onClick={async () => {
-                              
-                                const id = fav._id;
-                                if (!id || !user) return;
-                                try {
-                                    await axios.delete(`/api/favorites/${id}`);
-                                    setFavorites(prev => prev.filter(f => f._id !== id));
-                                    toast.success("Removed");
-                                } catch (e) {
-                                    const msg = e?.response?.data?.message || e?.message || 'Server sync failed';
-                                    toast.error(msg);
-                                }
-                            }}
-                            title="Remove from favorites"
-                            className="absolute top-3 left-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:scale-110"
-                        >
-                            <FiTrash2 className="text-red-600 text-xl" />
-                        </button>
-                    </div>
+                            <div className="mt-4 text-right">
+                                <span className="text-xs text-gray-400">Favorite ID: {fav._id}</span>
+                            </div>
+                        </div>
+                    )
                 ))}
             </div>
         </div>

@@ -1,54 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { toast } from "react-hot-toast";
+import React, { useState } from "react";
+import { FiTrash2 } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import axios from "axios";
 
-const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistically }) => {
-    const { user } = useAuth();
-    const [isFavorite, setIsFavorite] = useState(initialFavorite);
+const FavoriteCard = ({ review, favoriteId, onDelete }) => {
     const [loading, setLoading] = useState(false);
 
     const reviewId = (review?._id ?? review?.id)?.toString?.();
-
-    useEffect(() => {
-        setIsFavorite(initialFavorite);
-    }, [initialFavorite]);
-
-    const handleToggleFavorite = async () => {
-        if (!user?.email) {
-            toast.error("Please login first!");
-            return;
-        }
-        if (!reviewId) {
-            toast.error("Review ID missing!");
-            return;
-        }
-
-        setLoading(true);
-        const previous = isFavorite;
-        setIsFavorite(!previous);
-        updateFavoriteOptimistically?.(reviewId, !previous);
-
-        try {
-            if (previous) {
-                await axios.delete(`/api/favorites/${reviewId}`);
-                toast.success("Removed from favorites");
-            } else {
-                await axios.post('/api/favorites', { reviewId });
-                toast.success("Added to favorites");
-            }
-        } catch (err) {
-            console.error(err);
-            const msg = err?.response?.data?.message || err?.message || "Server sync failed";
-            setIsFavorite(previous);
-            updateFavoriteOptimistically?.(reviewId, previous);
-            toast.error(msg);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const imageUrl = (
         review?.foodImage ||
@@ -84,29 +43,43 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
     );
     const location = review?.location || review?.restaurantLocation || "";
 
+    const handleDelete = async () => {
+        if (!favoriteId) return;
+        setLoading(true);
+        try {
+            await axios.delete(`/api/favorites/${favoriteId}`);
+            toast.success("Removed from favorites");
+            onDelete?.(favoriteId);
+        } catch (e) {
+            const msg = e?.response?.data?.message || e?.message || 'Server sync failed';
+            toast.error(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all transform hover:-translate-y-2 h-full flex flex-col">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all transform hover:-translate-y-2 h-full flex flex-col relative">
             <div className="relative">
                 <img
                     src={imageUrl || "https://i.ibb.co/0j3PQZb/banner1.jpg"}
                     alt={review?.foodName}
-                    className="w-100 h-100 object-cover bg-gray-100"
+                    className="w-full h-00 object-contain bg-gray-100"
                     referrerPolicy="no-referrer"
                     loading="lazy"
                     decoding="async"
                     onError={(e) => { e.currentTarget.src = "https://i.ibb.co/0j3PQZb/banner1.jpg"; }}
                 />
                 <button
-                    onClick={handleToggleFavorite}
+                    onClick={handleDelete}
                     disabled={loading}
                     className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg z-10 hover:scale-110 transition-all"
+                    title="Remove from favorites"
                 >
                     {loading ? (
                         <div className="w-6 h-6 border-4 border-gray-300 border-t-red-500 rounded-full animate-spin"></div>
-                    ) : isFavorite ? (
-                        <FaHeart className="text-red-500 text-2xl drop-shadow" />
                     ) : (
-                        <FaRegHeart className="text-gray-600 text-2xl hover:text-red-500 transition drop-shadow" />
+                        <FiTrash2 className="text-red-600 text-2xl drop-shadow" />
                     )}
                 </button>
             </div>
@@ -127,4 +100,4 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
     );
 };
 
-export default ReviewCard;
+export default FavoriteCard;

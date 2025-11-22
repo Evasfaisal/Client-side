@@ -107,7 +107,7 @@ const MyReviews = () => {
                             <td className="px-4 py-2">{r.restaurantName}</td>
                             <td className="px-4 py-2">{new Date(r.postedDate || r.createdAt || r.date).toLocaleDateString()}</td>
                             <td className="px-4 py-2 flex gap-2">
-                                <button onClick={() => requestDelete(r._id)} className="px-3 py-1 bg-red-600 text-white rounded">Delete</button>
+                                <button onClick={() => requestDelete(r._id)} className="px-3 py-1 bg-green-600 text-white rounded">Delete</button>
                                 <button onClick={() => handleEdit(r)} className="px-3 py-1 bg-blue-600 text-white rounded">Edit</button>
                             </td>
                         </tr>
@@ -122,7 +122,7 @@ const MyReviews = () => {
                         <p className="text-sm text-gray-600">Delete this review?</p>
                         <div className="flex justify-end gap-3">
                             <button onClick={cancelDelete} className="px-4 py-2 border rounded">Cancel</button>
-                            <button onClick={confirmDelete} className="px-4 py-2 bg-red-600 text-white rounded">Delete</button>
+                            <button onClick={confirmDelete} className="px-4 py-2 bg-green-600 text-white rounded">Delete</button>
                         </div>
                     </div>
                 </div>

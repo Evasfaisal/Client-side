@@ -15,7 +15,6 @@ const Login = () => {
         e.preventDefault();
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            // Firebase sets auth.currentUser in-memory; axios interceptor will read token when needed
             toast.success("Login Successful!");
             navigate("/");
         } catch (error) {
@@ -27,7 +26,6 @@ const Login = () => {
         const provider = new GoogleAuthProvider();
         try {
             await signInWithPopup(auth, provider);
-            // Token and email will be provided via firebase in-memory; axios interceptor handles headers
             toast.success("Google Login Successful!");
             navigate("/");
         } catch (error) {

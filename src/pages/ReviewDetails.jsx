@@ -107,7 +107,7 @@ const ReviewDetails = () => {
             </div>
 
 
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden ">
                 <img
                     src={
                         review?.foodImage ||
@@ -131,7 +131,7 @@ const ReviewDetails = () => {
                         "https://i.ibb.co/0j3PQZb/banner1.jpg"
                     }
                     alt={review.foodName}
-                    className="w-full h-64 object-cover"
+                    className="w-full h-100 object-contain bg-gray-100"
                     referrerPolicy="no-referrer"
                     loading="lazy"
                     decoding="async"
@@ -203,7 +203,7 @@ const ReviewDetails = () => {
                                             }
                                         }
                                     }}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium"
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
                                 >
                                     Delete
                                 </button>
