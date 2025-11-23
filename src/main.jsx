@@ -51,7 +51,7 @@ axios.interceptors.request.use(
             hasAuthorization: hasAuth,
             hasXUserEmail: hasEmail,
           });
-        } catch { }
+        } catch { err}
       }
     }
     return config;

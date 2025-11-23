@@ -20,12 +20,12 @@ const RecentReviews = () => {
                     const res = await axios.get("/api/reviews/recent", { params: { t: Date.now() } });
                     data = Array.isArray(res.data) ? res.data : [];
                     if (import.meta.env.DEV) console.debug('[RecentReviews] used /recent', { count: data.length });
-                } catch (e1) {
+                } catch (er) {
                     try {
                         const res2 = await axios.get('/api/reviews', { params: { sort: 'date_desc', limit: 6, t: Date.now() } });
                         data = Array.isArray(res2.data) ? res2.data : (Array.isArray(res2.data?.items) ? res2.data.items : []);
                         if (import.meta.env.DEV) console.debug('[RecentReviews] used /reviews?sort=date_desc', { count: data.length });
-                    } catch (e2) {
+                    } catch (err) {
                         try {
                             const res3 = await axios.get('/api/reviews', { params: { t: Date.now() } });
                             const raw = Array.isArray(res3.data) ? res3.data : (Array.isArray(res3.data?.items) ? res3.data.items : []);
@@ -38,8 +38,8 @@ const RecentReviews = () => {
                                 ))
                                 .slice(0, 6);
                             if (import.meta.env.DEV) console.debug('[RecentReviews] used client-side sort of /reviews', { count: data.length });
-                        } catch (e3) {
-                            const msg = e3?.response?.data?.message || e3?.message || 'Network error';
+                        } catch (errr) {
+                            const msg = errr?.response?.data?.message || errr?.message || 'Network error';
                             toast.error(`Failed to load recent reviews: ${msg}`);
                             data = [];
                         }
