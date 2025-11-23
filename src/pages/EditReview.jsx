@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { apiUrl } from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -26,7 +27,7 @@ const EditReview = () => {
             if (!id) return;
             try {
                 setLoading(true);
-                const res = await axios.get(`http://localhost:5000/api/reviews/${id}`);
+                const res = await axios.get(apiUrl(`/api/reviews/${id}`));
                 const data = res.data;
 
                 setForm({
@@ -96,7 +97,7 @@ const EditReview = () => {
 
         try {
             setSubmitting(true);
-            await axios.put(`http://localhost:5000/api/reviews/${id}`, payload);
+            await axios.put(apiUrl(`/api/reviews/${id}`), payload);
             toast.success("Review updated successfully!");
             navigate("/my-reviews");
         } catch (err) {

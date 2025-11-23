@@ -3,6 +3,7 @@ import { FiTrash2 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import axios from "axios";
+import { apiUrl } from "../utils/api";
 
 const FavoriteCard = ({ review, favoriteId, onDelete }) => {
     const [loading, setLoading] = useState(false);
@@ -47,7 +48,7 @@ const FavoriteCard = ({ review, favoriteId, onDelete }) => {
         if (!favoriteId) return;
         setLoading(true);
         try {
-            await axios.delete(`/api/favorites/${favoriteId}`);
+            await axios.delete(apiUrl(`/api/favorites/${favoriteId}`));
             toast.success("Removed from favorites");
             onDelete?.(favoriteId);
         } catch (e) {

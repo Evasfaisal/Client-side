@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { apiUrl } from "../utils/api";
 import { useParams, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -34,7 +35,7 @@ const ReviewDetails = () => {
         const fetchReview = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`/api/reviews/${id}`);
+                const res = await axios.get(apiUrl(`/api/reviews/${id}`));
                 setReview(res.data);
             } catch {
                 setReview(null);
@@ -211,7 +212,7 @@ const ReviewDetails = () => {
                                     onClick={async () => {
                                         if (window.confirm("Delete this review?")) {
                                             try {
-                                                await axios.delete(`/api/reviews/${review._id}`);
+                                                await axios.delete(apiUrl(`/api/reviews/${review._id}`));
                                                 window.location.href = "/my-reviews";
                                             } catch {
                                                 alert("Delete failed");

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { apiUrl } from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -20,7 +21,7 @@ const MyReviews = () => {
 
         const fetchReviews = async () => {
             try {
-                const res = await axios.get(`/api/reviews?email=${user.email}&sort=date_desc`);
+                const res = await axios.get(apiUrl(`/api/reviews?email=${user.email}&sort=date_desc`));
                 const serverList = Array.isArray(res.data) ? res.data : [];
                 setReviews(serverList);
             } catch (err) {
@@ -41,7 +42,7 @@ const MyReviews = () => {
     const confirmDelete = async () => {
         if (!confirmId) return;
         try {
-            await axios.delete(`/api/reviews/${confirmId}`);
+            await axios.delete(apiUrl(`/api/reviews/${confirmId}`));
             setReviews(prev => prev.filter(r => r._id !== confirmId));
             toast.success("Review deleted!");
         } catch (err) {

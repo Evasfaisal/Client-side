@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import FavoriteCard from "../components/FavoriteCard";
 import { toast } from "react-hot-toast";
 import axios from "axios";
+import { apiUrl } from "../utils/api";
 import { FiTrash2 } from "react-icons/fi";
 
 const MyFavorites = () => {
@@ -24,9 +25,9 @@ const MyFavorites = () => {
             try {
                 let res;
                 try {
-                    res = await axios.get('/api/favorites/reviews');
+                    res = await axios.get(apiUrl('/api/favorites/reviews'));
                 } catch {
-                    res = await axios.get('/api/favorites', { params: { mode: 'reviews' } });
+                    res = await axios.get(apiUrl('/api/favorites'), { params: { mode: 'reviews' } });
                 }
                 const raw = res?.data;
                 const arr = Array.isArray(raw) ? raw : [];
@@ -45,7 +46,7 @@ const MyFavorites = () => {
                     try {
                         const reviewField = favItem.review;
                         const reviewId = typeof reviewField === 'string' ? reviewField : (reviewField && reviewField._id);
-                        const reviewRes = await axios.get(`/api/reviews/${reviewId}`);
+                        const reviewRes = await axios.get(apiUrl(`/api/reviews/${reviewId}`));
                         console.log(`[MyFavorites] Review API success for id ${reviewId}:`, reviewRes.data);
                         return {
                             _id: favItem._id,
@@ -113,7 +114,7 @@ const MyFavorites = () => {
 
                         const ids = favorites.map(f => f._id).filter(Boolean);
                         if (ids.length) {
-                            const results = await Promise.allSettled(ids.map(id => axios.delete(`/api/favorites/${id}`)));
+                            const results = await Promise.allSettled(ids.map(id => axios.delete(apiUrl(`/api/favorites/${id}`))));
                             const rejected = results.find(r => r.status === 'rejected');
                             if (rejected) {
                                 const err = rejected.reason;
@@ -145,7 +146,7 @@ const MyFavorites = () => {
                                     const id = fav._id;
                                     if (!id || !user) return;
                                     try {
-                                        await axios.delete(`/api/favorites/${id}`);
+                                        await axios.delete(apiUrl(`/api/favorites/${id}`));
                                         setFavorites(prev => prev.filter(f => f._id !== id));
                                         toast.success("Removed");
                                     } catch (e) {

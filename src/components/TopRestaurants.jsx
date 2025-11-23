@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { apiUrl } from "../utils/api";
 
 const TopRestaurants = () => {
     const [restaurants, setRestaurants] = useState([]);
@@ -7,7 +8,7 @@ const TopRestaurants = () => {
 
     useEffect(() => {
         axios
-            .get("/api/reviews?limit=6&sort=rating_desc")
+            .get(apiUrl("/api/reviews?limit=6&sort=rating_desc"))
             .then((res) => {
                 if (Array.isArray(res.data)) {
                     setRestaurants(res.data);

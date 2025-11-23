@@ -4,6 +4,7 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { apiUrl } from "../utils/api";
 
 const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistically }) => {
     const { user } = useAuth();
@@ -33,10 +34,10 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
 
         try {
             if (previous) {
-                await axios.delete(`http://localhost:5000/api/favorites/${reviewId}`);
+                await axios.delete(apiUrl(`/api/favorites/${reviewId}`));
                 toast.success("Removed from favorites");
             } else {
-                await axios.post('http://localhost:5000/api/favorites', { reviewId });
+                await axios.post(apiUrl('/api/favorites'), { reviewId });
                 toast.success("Added to favorites");
             }
         } catch (err) {

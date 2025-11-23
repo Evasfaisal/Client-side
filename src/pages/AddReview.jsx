@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { apiUrl } from "../utils/api";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -81,7 +82,7 @@ const AddReview = () => {
 
         try {
             setLoading(true);
-            await axios.post("http://localhost:5000/api/reviews", payload);
+            await axios.post(apiUrl("/api/reviews"), payload);
             toast.success("Review added successfully!");
             navigate("/");
         } catch (err) {

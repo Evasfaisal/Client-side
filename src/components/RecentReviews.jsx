@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { apiUrl } from "../utils/api";
 import ReviewCard from "./ReviewCard";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -17,17 +18,17 @@ const RecentReviews = () => {
                 setLoading(true);
                 let data = [];
                 try {
-                    const res = await axios.get("/api/reviews/recent", { params: { t: Date.now() } });
+                    const res = await axios.get(apiUrl("/api/reviews/recent"), { params: { t: Date.now() } });
                     data = Array.isArray(res.data) ? res.data : [];
                     if (import.meta.env.DEV) console.debug('[RecentReviews] used /recent', { count: data.length });
                 } catch (er) {
                     try {
-                        const res2 = await axios.get('/api/reviews', { params: { sort: 'date_desc', limit: 6, t: Date.now() } });
+                        const res2 = await axios.get(apiUrl('/api/reviews'), { params: { sort: 'date_desc', limit: 6, t: Date.now() } });
                         data = Array.isArray(res2.data) ? res2.data : (Array.isArray(res2.data?.items) ? res2.data.items : []);
                         if (import.meta.env.DEV) console.debug('[RecentReviews] used /reviews?sort=date_desc', { count: data.length });
                     } catch (err) {
                         try {
-                            const res3 = await axios.get('/api/reviews', { params: { t: Date.now() } });
+                            const res3 = await axios.get(apiUrl('/api/reviews'), { params: { t: Date.now() } });
                             const raw = Array.isArray(res3.data) ? res3.data : (Array.isArray(res3.data?.items) ? res3.data.items : []);
                             data = raw
                                 .slice()
@@ -63,7 +64,7 @@ const RecentReviews = () => {
                 return;
             }
             try {
-                const res = await axios.get('/api/favorites', { params: { email, idsOnly: true } });
+                const res = await axios.get(apiUrl('/api/favorites'), { params: { email, idsOnly: true } });
                 const serverIds = Array.isArray(res.data) ? res.data.map(String) : [];
                 if (!cancelled) setFavoriteIds(serverIds);
             } catch {
