@@ -42,7 +42,8 @@ const MyReviews = () => {
     const confirmDelete = async () => {
         if (!confirmId) return;
         try {
-            await axios.delete(apiUrl(`/api/reviews/${confirmId}`));
+            const userEmail = user?.email;
+            await axios.delete(apiUrl(`/api/reviews/${confirmId}`), { data: { userEmail } });
             setReviews(prev => prev.filter(r => r._id !== confirmId));
             toast.success("Review deleted!");
         } catch (err) {

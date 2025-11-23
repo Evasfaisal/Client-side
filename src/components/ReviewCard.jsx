@@ -34,10 +34,16 @@ const ReviewCard = ({ review, initialFavorite = false, updateFavoriteOptimistica
 
         try {
             if (previous) {
-                await axios.delete(apiUrl(`/api/favorites/${reviewId}`));
+                const token = await user.getIdToken();
+                await axios.delete(apiUrl(`/api/favorites/${reviewId}`), {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'x-user-email': user.email
+                    }
+                });
                 toast.success("Removed from favorites");
             } else {
-                await axios.post(apiUrl('/api/favorites'), { reviewId });
+                await axios.post(apiUrl('/api/favorites'), { reviewId, userEmail: user.email });
                 toast.success("Added to favorites");
             }
         } catch (err) {

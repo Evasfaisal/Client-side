@@ -82,7 +82,12 @@ const AddReview = () => {
 
         try {
             setLoading(true);
-            await axios.post(apiUrl("/api/reviews"), payload);
+            const token = await user.getIdToken();
+            await axios.post(apiUrl("/api/reviews"), payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             toast.success("Review added successfully!");
             navigate("/");
         } catch (err) {

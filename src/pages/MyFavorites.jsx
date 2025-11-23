@@ -8,6 +8,8 @@ import { FiTrash2 } from "react-icons/fi";
 
 const MyFavorites = () => {
     const { user } = useAuth();
+    // Debug: log user context
+    console.log('[MyFavorites] user:', user);
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -15,6 +17,22 @@ const MyFavorites = () => {
     useEffect(() => {
         let cancelled = false;
         const load = async () => {
+            // Debug: check user and token before API call
+            if (user) {
+                console.log('[MyFavorites] user:', user);
+                try {
+                    const token = await user.getIdToken();
+                    console.log('[MyFavorites] token:', token);
+                } catch (e) {
+                    console.warn('[MyFavorites] No token:', e);
+                }
+            }
+            // Debug: log before API call
+            if (user) {
+                console.log('[MyFavorites] user.email:', user.email);
+            } else {
+                console.log('[MyFavorites] user is null');
+            }
             if (!user?.email) {
                 if (!cancelled) {
                     setFavorites([]);
@@ -25,9 +43,18 @@ const MyFavorites = () => {
             try {
                 let res;
                 try {
-                    res = await axios.get(apiUrl('/api/favorites/reviews'));
+                    res = await axios.get(apiUrl('/api/favorites/reviews'), {
+                        headers: {
+                            'X-User-Email': user.email
+                        }
+                    });
                 } catch {
-                    res = await axios.get(apiUrl('/api/favorites'), { params: { mode: 'reviews' } });
+                    res = await axios.get(apiUrl('/api/favorites'), {
+                        params: { mode: 'reviews' },
+                        headers: {
+                            'X-User-Email': user.email
+                        }
+                    });
                 }
                 const raw = res?.data;
                 const arr = Array.isArray(raw) ? raw : [];
@@ -114,7 +141,9 @@ const MyFavorites = () => {
 
                         const ids = favorites.map(f => f._id).filter(Boolean);
                         if (ids.length) {
-                            const results = await Promise.allSettled(ids.map(id => axios.delete(apiUrl(`/api/favorites/${id}`))));
+                            const userEmail = user?.email;
+                            console.log('[MyFavorites] Bulk remove, userEmail:', userEmail);
+                            const results = await Promise.allSettled(ids.map(id => axios.delete(apiUrl(`/api/favorites/${id}`), { data: { userEmail } })));
                             const rejected = results.find(r => r.status === 'rejected');
                             if (rejected) {
                                 const err = rejected.reason;
@@ -146,7 +175,9 @@ const MyFavorites = () => {
                                     const id = fav._id;
                                     if (!id || !user) return;
                                     try {
-                                        await axios.delete(apiUrl(`/api/favorites/${id}`));
+                                        const userEmail = user?.email;
+                                        console.log('[MyFavorites] Single remove, userEmail:', userEmail);
+                                        await axios.delete(apiUrl(`/api/favorites/${id}`), { data: { userEmail } });
                                         setFavorites(prev => prev.filter(f => f._id !== id));
                                         toast.success("Removed");
                                     } catch (e) {

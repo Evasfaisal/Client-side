@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import { FiTrash2 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -7,6 +8,7 @@ import { apiUrl } from "../utils/api";
 
 const FavoriteCard = ({ review, favoriteId, onDelete }) => {
     const [loading, setLoading] = useState(false);
+    const { user } = useAuth();
 
     const reviewId = (review?._id ?? review?.id)?.toString?.();
 
@@ -46,9 +48,21 @@ const FavoriteCard = ({ review, favoriteId, onDelete }) => {
 
     const handleDelete = async () => {
         if (!favoriteId) return;
+        if (!user?.email) {
+            toast.error("User not logged in");
+            return;
+        }
         setLoading(true);
         try {
-            await axios.delete(apiUrl(`/api/favorites/${favoriteId}`));
+            const userEmail = user.email;
+            const token = await user.getIdToken();
+            console.log('[FavoriteCard] Removing favorite, userEmail:', userEmail);
+            await axios.delete(apiUrl(`/api/favorites/${favoriteId}`), {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'x-user-email': userEmail
+                }
+            });
             toast.success("Removed from favorites");
             onDelete?.(favoriteId);
         } catch (e) {
