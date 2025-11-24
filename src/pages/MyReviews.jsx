@@ -43,7 +43,13 @@ const MyReviews = () => {
         if (!confirmId) return;
         try {
             const userEmail = user?.email;
-            await axios.delete(apiUrl(`/api/reviews/${confirmId}`), { data: { userEmail } });
+            const token = await user.getIdToken();
+            await axios.delete(apiUrl(`/api/reviews/${confirmId}`), {
+                data: { userEmail },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             setReviews(prev => prev.filter(r => r._id !== confirmId));
             toast.success("Review deleted!");
         } catch (err) {

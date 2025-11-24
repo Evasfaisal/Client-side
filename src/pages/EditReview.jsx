@@ -97,7 +97,12 @@ const EditReview = () => {
 
         try {
             setSubmitting(true);
-            await axios.put(apiUrl(`/api/reviews/${id}`), payload);
+            const token = await user.getIdToken();
+            await axios.put(apiUrl(`/api/reviews/${id}`), payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             toast.success("Review updated successfully!");
             navigate("/my-reviews");
         } catch (err) {
