@@ -64,7 +64,14 @@ const AllReviews = () => {
         };
 
         fetchData();
-        return () => { cancelled = true; };
+
+        // Listen for custom event to clear favoriteIds
+        const clearHandler = () => setFavoriteIds([]);
+        window.addEventListener('clear-favorite-ids', clearHandler);
+        return () => {
+            cancelled = true;
+            window.removeEventListener('clear-favorite-ids', clearHandler);
+        };
     }, [search, user?.email]);
 
     return (

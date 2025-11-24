@@ -142,17 +142,32 @@ const MyFavorites = () => {
                         const ids = favorites.map(f => f._id).filter(Boolean);
                         if (ids.length) {
                             const userEmail = user?.email;
+                            const token = await user.getIdToken();
                             console.log('[MyFavorites] Bulk remove, userEmail:', userEmail);
-                            const results = await Promise.allSettled(ids.map(id => axios.delete(apiUrl(`/api/favorites/${id}`), { data: { userEmail } })));
+                            const results = await Promise.allSettled(
+                                ids.map(id =>
+                                    axios.delete(apiUrl(`/api/favorites/${id}`), {
+                                        headers: {
+                                            'x-user-email': userEmail,
+                                            'Authorization': `Bearer ${token}`
+                                        }
+                                    })
+                                )
+                            );
+                            // Only keep successfully deleted favorites
+                            const successfulIds = ids.filter((_, i) => results[i].status === 'fulfilled');
+                            setFavorites(prev => prev.filter(f => !successfulIds.includes(f._id)));
+                            // Dispatch custom event to clear favoriteIds in AllReviews
+                            window.dispatchEvent(new Event('clear-favorite-ids'));
                             const rejected = results.find(r => r.status === 'rejected');
                             if (rejected) {
                                 const err = rejected.reason;
                                 const msg = err?.response?.data?.message || err?.message || 'Server sync failed';
                                 toast.error(msg);
+                            } else {
+                                toast.success("All favorites cleared");
                             }
                         }
-                        setFavorites([]);
-                        toast.success("All favorites cleared");
                     }}
                     className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
                 >
